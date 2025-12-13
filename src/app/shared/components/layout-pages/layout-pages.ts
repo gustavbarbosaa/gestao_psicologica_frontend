@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { LayoutComponent } from '../layout/layout.component';
 import { ContentComponent } from '../layout/content.component';
 import { SidebarComponent } from '../layout/sidebar.component';
-import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-layout-pages',
-  imports: [LayoutComponent, ContentComponent, SidebarComponent, RouterOutlet],
+  imports: [LayoutComponent, ContentComponent, SidebarComponent],
   templateUrl: './layout-pages.html',
   styleUrl: './layout-pages.css',
 })

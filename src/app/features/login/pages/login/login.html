@@ -1,22 +1,11 @@
 <div class="flex flex-col min-h-screen w-full items-center justify-center px-4 gap-8">
-  <div class="flex flex-col items-center justify-center rounded-sm gap-4">
-    <div
-      class="flex items-center justify-center h-16 w-16 bg-accent-foreground rounded-md drop-shadow-md"
-    >
-      <i z-icon zType="heart" zSize="xl" class="text-red-500"></i>
-    </div>
-    <div class="flex flex-col items-center justify-center">
-      <h3 class="text-2xl font-semibold">PsicoGestão</h3>
-      <h4 class="text-lg text-gray-600">Sistema de Gestão Psicológica</h4>
-    </div>
-  </div>
-
+  <app-icone-login />
   <z-card
     class="w-full max-w-sm px-6 py-8 shadow-lg border-[0.2px] border-gray-200"
     zTitle="Entrar com sua conta"
     zDescription="Digite seu email abaixo para entrar na sua conta"
   >
-    <div class="space-y-4">
+    <form [formGroup]="loginForm" class="space-y-4">
       <div class="space-y-2">
         <label
           [for]="idEmail"
@@ -26,6 +15,7 @@
         </label>
         <input
           z-input
+          formControlName="email"
           [id]="idEmail"
           type="email"
           placeholder="email@exemplo.com"
@@ -47,6 +37,7 @@
         </div>
         <input
           z-input
+          formControlName="senha"
           [id]="idPassword"
           type="password"
           placeholder="****************"
@@ -55,19 +46,13 @@
         />
       </div>
       <div class="space-y-2">
-        <z-button zType="default" class="w-full">Entrar</z-button>
+        <z-button zType="default" class="w-full" (click)="signIn()">Entrar</z-button>
         <z-divider />
         <z-button zType="outline" class="w-full" (click)="signInWithGoogle()">
           <i class="fa-brands fa-google"></i> Google
         </z-button>
       </div>
-    </div>
+    </form>
   </z-card>
-
-  <div class="text-center text-sm text-gray-600">
-    Não possui uma conta?
-    <a href="#" class="ml-1 underline-offset-4 hover:underline text-secondary-foreground"
-      >Registre-se</a
-    >
-  </div>
+  <app-esqueceu-senha />
 </div>

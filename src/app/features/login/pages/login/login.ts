@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { EsqueceuSenha } from '@features/login/components/esqueceu-senha/esqueceu-senha';
+import { IconeLogin } from '@features/login/components/icone-login/icone-login';
 import { ZardButtonComponent } from '@shared/components/button/button.component';
 import { ZardCardComponent } from '@shared/components/card/card.component';
 import { ZardDividerComponent } from '@shared/components/divider/divider.component';
-import { ZardIconComponent } from '@shared/components/icon/icon.component';
 import { generateId } from '@shared/utils/merge-classes';
+import { FormGroup, ReactiveFormsModule, NonNullableFormBuilder, Validators } from '@angular/forms';
+import { LoginService } from '@core/services/login-service';
+import { Router } from '@angular/router';
+import { ToastService } from '@shared/services/toast-service';
 
 interface GoogleSignInResponse {
   getBasicProfile(): {
@@ -36,16 +41,42 @@ declare const gapi: Gapi;
 
 @Component({
   selector: 'app-login',
-  imports: [ZardButtonComponent, ZardCardComponent, ZardDividerComponent, ZardIconComponent],
+  imports: [
+    ZardButtonComponent,
+    ZardCardComponent,
+    ZardDividerComponent,
+    IconeLogin,
+    EsqueceuSenha,
+    ReactiveFormsModule,
+  ],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login implements OnInit {
   protected readonly idEmail = generateId('email');
   protected readonly idPassword = generateId('password');
+  protected loginForm!: FormGroup;
+
+  private formBuilderService = inject(NonNullableFormBuilder);
+  private loginService = inject(LoginService);
+  private router = inject(Router);
+  private toastService = inject(ToastService);
 
   ngOnInit(): void {
     this.initializeGoogleSignIn();
+    this.initLoginForm();
+  }
+
+  private initLoginForm(): void {
+    this.loginForm = this.formBuilderService.group({
+      email: ['', [Validators.email]],
+      senha: ['', [Validators.minLength(6), Validators.maxLength(20)]],
+    });
+  }
+
+  handleCredentialRespons(response: any): void {
+    const token = response.credential;
+    this.onSignIn(token);
   }
 
   private initializeGoogleSignIn(): void {
@@ -87,5 +118,24 @@ export class Login implements OnInit {
 
     const id_token = googleUser.getAuthResponse().id_token;
     console.log('ID Token:', id_token);
+  }
+
+  protected signIn(): void {
+    if (this.loginForm.invalid) {
+      return;
+    }
+
+    const loginData = this.loginForm.getRawValue();
+
+    this.loginService.login(loginData).subscribe({
+      next: () => {
+        console.log('Login realizado com sucesso!');
+        this.toastService.exibirToastSucesso('Sucesso', 'Redirecionando para a página principal!');
+      },
+      error: (error) => {
+        console.error(error);
+        this.toastService.exibirToastErro('Erro', 'Verifique suas credenciais!');
+      },
+    });
   }
 }
