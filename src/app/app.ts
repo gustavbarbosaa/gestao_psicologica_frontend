@@ -2,22 +2,18 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LoginService } from '@core/services/login-service';
 import { Login } from '@features/login/pages/login/login';
-import { ContentComponent } from '@shared/components/layout/content.component';
-import { LayoutComponent } from '@shared/components/layout/layout.component';
 import { ZardToastComponent } from '@shared/components/toast/toast.component';
+import { LayoutPages } from '@shared/components/layout-pages/layout-pages';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LayoutComponent, ContentComponent, ZardToastComponent, Login],
+  imports: [RouterOutlet, ZardToastComponent, Login, LayoutPages],
   template: `
     @if (estadoUsuarioLogado()) {
-      <div class="flex flex-col items-center justify-center h-full w-full gap-6">
-        <z-layout class="overflow-hidden rounded-lg">
-          <z-content class="min-h-[200px] flex items-center justify-center h-full w-full">
-            <router-outlet />
-          </z-content>
-        </z-layout>
-      </div>
+      <app-layout-pages>
+        <router-outlet />
+      </app-layout-pages>
+
       <z-toaster></z-toaster>
     } @else if (!estadoUsuarioLogado()) {
       <app-login />

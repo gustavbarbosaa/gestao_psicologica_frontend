@@ -1,0 +1,7 @@
+<div class="flex items-center justify-start gap-2">
+  <z-avatar [zFallback]="iniciais()" zSize="md" zShape="rounded" />
+  <div class="flex flex-col items-start">
+    <p class="text-md font-semibold">{{ nome() }}</p>
+    <small class="max-w-[150px] text-sm font-normal text-gray-600 truncate">{{ email() }}</small>
+  </div>
+</div>

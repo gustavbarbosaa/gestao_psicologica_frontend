@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h3 class="text-xs font-normal tracking-widest text-muted-foreground">MENU PRINCIPAL</h3>
+    <z-divider />
+  </div>
+
+  <ul class="flex flex-col gap-1">
+    @for (menu of listaMenus; track menu.titulo) {
+      <li>
+        <a
+          [routerLink]="menu.url"
+          routerLinkActive="bg-muted text-foreground"
+          class="flex items-center gap-3 rounded-md px-3 py-2 text-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <i z-icon [zType]="menu.icone" zSize="sm" class="shrink-0"></i>
+
+          <span>{{ menu.titulo }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</div>

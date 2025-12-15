@@ -1,8 +1,19 @@
-<z-layout class="overflow-hidden rounded-lg">
-  <z-sidebar class="border-0" [zWidth]="120">Sidebar</z-sidebar>
-  <z-layout>
-    <z-content class="min-h-[200px]">
-      <ng-content />
+<z-layout class="h-full w-full overflow-hidden rounded-lg">
+  <z-sidebar class="relative flex h-full flex-col border-none drop-shadow-md" [zWidth]="260">
+    <div class="pb-12">
+      <app-logo />
+    </div>
+
+    <app-menu-principal class="flex-1 overflow-auto pb-24" />
+
+    <div class="absolute bottom-0 left-0 w-full px-6 py-4">
+      <app-avatar-info [nome]="usuario()!.nome" [email]="usuario()!.email" />
+    </div>
+  </z-sidebar>
+
+  <z-layout class="flex-1 h-full w-full">
+    <z-content class="h-full w-full min-h-[200px] p-6">
+      <ng-content></ng-content>
     </z-content>
   </z-layout>
 </z-layout>
