@@ -129,11 +129,10 @@ export class Login implements OnInit {
 
     this.loginService.login(loginData).subscribe({
       next: () => {
-        console.log('Login realizado com sucesso!');
         this.toastService.exibirToastSucesso('Sucesso', 'Redirecionando para a página principal!');
+        this.router.navigate(['/home']);
       },
-      error: (error) => {
-        console.error(error);
+      error: () => {
         this.toastService.exibirToastErro('Erro', 'Verifique suas credenciais!');
       },
     });
