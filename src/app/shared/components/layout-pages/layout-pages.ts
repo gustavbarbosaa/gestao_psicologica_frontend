@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { LayoutComponent } from '../layout/layout.component';
 import { ContentComponent } from '../layout/content.component';
 import { SidebarComponent } from '../layout/sidebar.component';
@@ -13,7 +13,12 @@ import { LoginService } from '@core/services/login-service';
   templateUrl: './layout-pages.html',
   styleUrl: './layout-pages.css',
 })
-export class LayoutPages {
+export class LayoutPages implements OnInit {
   private loginService = inject(LoginService);
+
   usuario = this.loginService.usuario;
+
+  ngOnInit(): void {
+    this.loginService.carregarUsuario().subscribe();
+  }
 }
