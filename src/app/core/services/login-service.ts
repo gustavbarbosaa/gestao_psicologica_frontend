@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
 import { environment } from '@env/environment';
-import { iLoginRequest } from '@shared/models/login.model';
-import { iUsuario } from '@shared/models/usuario.model';
+import { iLoginRequest, iLoginResponse } from '@shared/models/login.model';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 
 @Injectable({
@@ -16,19 +15,34 @@ export class LoginService {
   private CADASTRO_PATH: string = 'autenticacao/cadastro';
   private ME_PATH: string = 'autenticacao/me';
 
-  protected readonly usuarioLogado = signal<boolean | null>(null);
-  usuario = signal<iUsuario | null>(null);
+  protected readonly usuarioLogado = signal<boolean>(false);
+  usuario = signal<iLoginResponse | null>(null);
 
-  login(data: iLoginRequest): Observable<void> {
-    return this.httpClient.post<void>(`${this.API_URL}/${this.LOGIN_PATH}`, data);
+  login(data: iLoginRequest): Observable<iLoginResponse> {
+    return this.httpClient.post<iLoginResponse>(`${this.API_URL}/${this.LOGIN_PATH}`, data).pipe(
+      tap((response: iLoginResponse) => {
+        this.usuarioLogado.set(true);
+        this.usuario.set(response);
+      }),
+    );
   }
 
   logout(): Observable<void> {
-    return this.httpClient.post<void>(`${this.API_URL}/${this.LOGOUT_PATH}`, {});
+    return this.httpClient.post<void>(`${this.API_URL}/${this.LOGOUT_PATH}`, {}).pipe(
+      tap(() => {
+        this.usuarioLogado.set(false);
+        this.usuario.set(null);
+      }),
+      catchError(() => {
+        this.usuarioLogado.set(false);
+        this.usuario.set(null);
+        return of(void 0);
+      }),
+    );
   }
 
-  carregarUsuario(): Observable<iUsuario> {
-    return this.httpClient.get<iUsuario>(`${this.API_URL}/${this.ME_PATH}`).pipe(
+  carregarUsuario(): Observable<iLoginResponse> {
+    return this.httpClient.get<iLoginResponse>(`${this.API_URL}/${this.ME_PATH}`).pipe(
       tap((usuario) => {
         this.usuario.set(usuario);
         this.usuarioLogado.set(true);
@@ -36,9 +50,9 @@ export class LoginService {
     );
   }
 
-  verificaUsuarioLogado(): Observable<void> {
+  verificaUsuarioLogado(): Observable<boolean> {
     return this.carregarUsuario().pipe(
-      map(() => void 0),
+      map(() => true),
       catchError((error) => {
         this.usuario.set(null);
         this.usuarioLogado.set(false);
@@ -47,7 +61,7 @@ export class LoginService {
     );
   }
 
-  isLogado(): Signal<boolean | null> {
+  isLogado(): Signal<boolean> {
     return this.usuarioLogado.asReadonly();
   }
 }

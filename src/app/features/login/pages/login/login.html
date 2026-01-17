@@ -1,58 +1,77 @@
-<div class="flex flex-col min-h-screen w-full items-center justify-center px-4 gap-8">
-  <app-icone-login />
-  <z-card
-    class="w-full max-w-sm px-6 py-8 shadow-lg border-[0.2px] border-gray-200"
-    zTitle="Entrar com sua conta"
-    zDescription="Digite seu email abaixo para entrar na sua conta"
-  >
-    <form [formGroup]="loginForm" class="space-y-4">
-      <div class="space-y-2">
-        <label
-          [for]="idEmail"
-          class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Email
-        </label>
-        <input
-          z-input
-          formControlName="email"
-          [id]="idEmail"
-          type="email"
-          placeholder="email@exemplo.com"
-          class="border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          required
-        />
+<div class="flex min-h-screen w-full">
+  <section class="w-full h-screen hidden sm:flex items-center justify-start text-white
+    bg-primary bg-[radial-gradient(at_0%_0%,var(--chart-1)_0,transparent_50%),radial-gradient(at_100%_100%,var(--chart-2)_0,transparent_50%)] p-8">
+    <div class="container flex flex-col gap-8 justify-between h-full">
+      <div>
+        <app-logo [logoReduzida]="false"/>
       </div>
-      <div class="space-y-2">
-        <div class="flex items-center">
+      <h1 class="font-bold text-2xl text-start">"Cuidar da mente é cuidar da vida. <br> Organize sua clínica com leveza."</h1>
+      <footer>
+        <small>© 2026 PsiManager</small>
+      </footer>
+    </div>
+  </section>
+  <section class="w-full flex flex-col min-h-screen items-center justify-center px-4 gap-8">
+    <app-logo [logoReduzida]="true" />
+    <z-card
+      class="w-full max-w-sm px-6 py-8 shadow-lg border-[0.2px] border-gray-200"
+      zTitle="Entrar com sua conta"
+      zDescription="Digite seu email abaixo para entrar na sua conta"
+    >
+      <form [formGroup]="loginForm" class="space-y-4">
+        <div class="space-y-2">
           <label
-            [for]="idPassword"
+            [for]="idEmail"
             class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            Senha
+            Email
           </label>
-          <a href="#" class="ml-auto text-sm underline-offset-4 hover:underline">
-            Esqueceu sua senha?
-          </a>
+          <input
+            z-input
+            formControlName="email"
+            [id]="idEmail"
+            type="email"
+            placeholder="email@exemplo.com"
+            class="border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            required
+          />
         </div>
-        <input
-          z-input
-          formControlName="senha"
-          [id]="idPassword"
-          type="password"
-          placeholder="****************"
-          class="border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          required
-        />
-      </div>
-      <div class="space-y-2">
-        <z-button zType="default" class="w-full" (click)="signIn()">Entrar</z-button>
-        <z-divider />
-        <z-button zType="outline" class="w-full" (click)="signInWithGoogle()">
-          <i class="fa-brands fa-google"></i> Google
-        </z-button>
-      </div>
-    </form>
-  </z-card>
-  <app-esqueceu-senha />
+        <div class="space-y-2">
+          <div class="flex items-center">
+            <label
+              [for]="idPassword"
+              class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Senha
+            </label>
+            <a href="#" class="ml-auto text-sm underline-offset-4 hover:underline">
+              Esqueceu sua senha?
+            </a>
+          </div>
+          <input
+            z-input
+            formControlName="senha"
+            [id]="idPassword"
+            type="password"
+            placeholder="****************"
+            class="border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            required
+          />
+        </div>
+        <div class="space-y-2">
+          <z-button zType="default" class="w-full" (click)="signIn()">
+            @if (loading()) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+            }
+            Entrar
+          </z-button>
+          <z-divider />
+          <z-button zType="outline" class="w-full" (click)="signInWithGoogle()">
+            <i class="fa-brands fa-google"></i> Google
+          </z-button>
+        </div>
+      </form>
+    </z-card>
+    <app-esqueceu-senha />
+  </section>
 </div>

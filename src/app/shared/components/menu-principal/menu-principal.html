@@ -12,11 +12,19 @@
           routerLinkActive="bg-muted text-foreground"
           class="flex items-center gap-3 rounded-md px-3 py-2 text-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
         >
-          <i z-icon [zType]="menu.icone" zSize="sm" class="shrink-0"></i>
+          <i z-icon [zType]="menu.icone" zSize="xl" class="shrink-0"></i>
 
           <span>{{ menu.titulo }}</span>
         </a>
       </li>
     }
+    <button
+      type="button"
+      (click)="logout()"
+      class="mt-2 flex w-full items-center gap-3 rounded-md px-3 py-2 text-md font-medium text-destructive transition-all duration-200 hover:bg-red-50 active:bg-red-100"
+    >
+      <i z-icon zType="log-out" zSize="xl" class="shrink-0 text-red-500"></i>
+      <span>Sair</span>
+    </button>
   </ul>
 </div>

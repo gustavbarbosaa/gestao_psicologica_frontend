@@ -4,6 +4,11 @@ import { loginGuard } from '@core/guards/login-guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
+  {
     path: 'home',
     loadComponent: () => import('./features/home/home-page/home-page').then((m) => m.HomePage),
     canMatch: [authGuard],
@@ -13,5 +18,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/login/pages/login/login').then((m) => m.Login),
     canMatch: [loginGuard],
   },
-  { path: '**', redirectTo: 'home' },
+  {
+    path: '**',
+    redirectTo: 'home',
+  },
 ];

@@ -1,10 +1,13 @@
-import { Component } from '@angular/core';
-import { ZardIconComponent } from '../icon/icon.component';
+import { NgClass } from '@angular/common';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-logo',
-  imports: [ZardIconComponent],
+  imports: [NgClass],
   templateUrl: './logo.html',
   styleUrl: './logo.css',
 })
-export class Logo {}
+export class Logo {
+  logoReduzida = input.required<boolean>();
+  corSubtitulo = input<string>('text-accent');
+}

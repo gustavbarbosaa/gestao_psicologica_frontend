@@ -19,8 +19,7 @@ export const authGuard: CanMatchFn = () => {
   return loginService.verificaUsuarioLogado().pipe(
     map(() => true),
     catchError(() => {
-      router.navigate(['/login']);
-      return of(false);
+      return of(router.createUrlTree(['/login']));
     }),
   );
 };

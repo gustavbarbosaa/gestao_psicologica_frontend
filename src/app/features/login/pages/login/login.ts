@@ -1,6 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { EsqueceuSenha } from '@features/login/components/esqueceu-senha/esqueceu-senha';
-import { IconeLogin } from '@features/login/components/icone-login/icone-login';
 import { ZardButtonComponent } from '@shared/components/button/button.component';
 import { ZardCardComponent } from '@shared/components/card/card.component';
 import { ZardDividerComponent } from '@shared/components/divider/divider.component';
@@ -9,6 +8,7 @@ import { FormGroup, ReactiveFormsModule, NonNullableFormBuilder, Validators } fr
 import { LoginService } from '@core/services/login-service';
 import { Router } from '@angular/router';
 import { ToastService } from '@shared/services/toast-service';
+import { Logo } from '@shared/components/logo/logo';
 
 interface GoogleSignInResponse {
   getBasicProfile(): {
@@ -45,9 +45,9 @@ declare const gapi: Gapi;
     ZardButtonComponent,
     ZardCardComponent,
     ZardDividerComponent,
-    IconeLogin,
     EsqueceuSenha,
     ReactiveFormsModule,
+    Logo,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -56,6 +56,7 @@ export class Login implements OnInit {
   protected readonly idEmail = generateId('email');
   protected readonly idPassword = generateId('password');
   protected loginForm!: FormGroup;
+  protected loading = signal<boolean>(false);
 
   private formBuilderService = inject(NonNullableFormBuilder);
   private loginService = inject(LoginService);
@@ -125,15 +126,21 @@ export class Login implements OnInit {
       return;
     }
 
+    this.loading.set(true);
     const loginData = this.loginForm.getRawValue();
 
     this.loginService.login(loginData).subscribe({
       next: () => {
+        this.loading.set(false);
         this.toastService.exibirToastSucesso('Sucesso', 'Redirecionando para a página principal!');
         this.router.navigate(['/home']);
       },
       error: () => {
+        this.loading.set(false);
         this.toastService.exibirToastErro('Erro', 'Verifique suas credenciais!');
+      },
+      complete: () => {
+        this.loading.set(false);
       },
     });
   }

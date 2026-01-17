@@ -8,8 +8,7 @@ export const loginGuard: CanMatchFn = () => {
   const router = inject(Router);
 
   if (loginService.isLogado()) {
-    router.navigate(['/home']);
-    return false;
+    return router.createUrlTree(['/home']);
   }
 
   if (!loginService.isLogado()) {
@@ -18,8 +17,7 @@ export const loginGuard: CanMatchFn = () => {
 
   return loginService.verificaUsuarioLogado().pipe(
     map(() => {
-      router.navigate(['/home']);
-      return false;
+      return router.createUrlTree(['/home']);
     }),
     catchError(() => of(true)),
   );
