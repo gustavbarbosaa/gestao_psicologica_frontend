@@ -19,6 +19,12 @@ export const routes: Routes = [
     canMatch: [loginGuard],
   },
   {
+    path: 'agendamentos',
+    loadComponent: () =>
+      import('./features/agendamentos/pages/agendamentos/agendamentos').then((m) => m.Agendamentos),
+    canMatch: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },

@@ -30,7 +30,7 @@ export class MenuPrincipal implements OnInit {
       {
         icone: 'calendar',
         titulo: 'Agendamentos',
-        url: '#',
+        url: '/agendamentos',
       },
       {
         icone: 'users',

@@ -8,4 +8,5 @@ export interface iLoginResponse {
   nome: string;
   email: string;
   permissoes: string[];
+  ativo: boolean;
 }
