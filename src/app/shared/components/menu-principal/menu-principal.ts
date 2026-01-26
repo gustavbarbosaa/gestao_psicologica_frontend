@@ -35,7 +35,7 @@ export class MenuPrincipal implements OnInit {
       {
         icone: 'users',
         titulo: 'Pacientes',
-        url: '#',
+        url: '/pacientes',
       },
       {
         icone: 'circle-dollar-sign',

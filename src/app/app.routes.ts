@@ -25,6 +25,12 @@ export const routes: Routes = [
     canMatch: [authGuard],
   },
   {
+    path: 'pacientes',
+    loadComponent: () =>
+      import('./features/pacientes/pages/pacientes/pacientes').then((m) => m.Pacientes),
+    canMatch: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },

@@ -1,0 +1,53 @@
+<div class="w-full">
+  <div class="overflow-hidden">
+    <table z-table zType="striped">
+      <thead z-table-header>
+        <tr z-table-row>
+          <th z-table-head>Nome</th>
+          <th z-table-head>Email</th>
+          <th z-table-head>Status</th>
+          <th z-table-head class="w-16">Ações</th>
+        </tr>
+      </thead>
+      <tbody z-table-body>
+        @for (paciente of pacientes(); track paciente.id) {
+          <tr z-table-row>
+            <td z-table-cell>
+              <div>{{ paciente.nome }}</div>
+            </td>
+            <td z-table-cell>
+              <div>{{ paciente.email }}</div>
+            </td>
+            <td z-table-cell>
+              <z-badge [zType]="paciente.ativo ? 'default' : 'destructive'">
+                {{ paciente.ativo ? 'Ativo' : 'Inativo' }}
+              </z-badge>
+            </td>
+            <td z-table-cell>
+              <div class="flex items-center gap-2">
+                <z-button
+                  zType="ghost"
+                  title="Editar paciente"
+                  (click)="editarPaciente(paciente.id)"
+                >
+                  <div z-icon zType="settings"></div>
+                </z-button>
+                <z-button
+                  zType="ghost"
+                  title="Remover paciente"
+                  (click)="removerPaciente(paciente.id)"
+                >
+                  <div z-icon zType="trash"></div>
+                </z-button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr z-table-row>
+            <td z-table-cell [attr.colspan]="4" class="h-24 text-center">Sem pacientes.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

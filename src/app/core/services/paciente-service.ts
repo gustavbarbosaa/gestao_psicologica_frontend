@@ -24,8 +24,8 @@ export class PacienteService {
     );
   }
 
-  public buscarPacientesPorUsuario(): Observable<iPacienteMinResponse[]> {
-    return this.httpClient.get<iPacienteMinResponse[]>(
+  public buscarPacientesPorUsuario(): Observable<iPacienteMaxResponse[]> {
+    return this.httpClient.get<iPacienteMaxResponse[]>(
       `${this.API_URL}${this.PACIENTES_POR_USUARIO_PATH}`,
     );
   }
