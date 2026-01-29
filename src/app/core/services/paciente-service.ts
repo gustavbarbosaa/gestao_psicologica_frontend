@@ -24,6 +24,12 @@ export class PacienteService {
     );
   }
 
+  public buscarPacientePorIdDetalhado(pacienteId: string): Observable<iPacienteMaxResponse> {
+    return this.httpClient.get<iPacienteMaxResponse>(
+      `${this.API_URL}${this.PACIENTES_PATH}/${pacienteId}/detalhes`,
+    );
+  }
+
   public buscarPacientesPorUsuario(): Observable<iPacienteMaxResponse[]> {
     return this.httpClient.get<iPacienteMaxResponse[]>(
       `${this.API_URL}${this.PACIENTES_POR_USUARIO_PATH}`,
@@ -45,8 +51,8 @@ export class PacienteService {
     pacienteId: string,
     dados: iPacienteRequest,
   ): Observable<iPacienteMinResponse> {
-    return this.httpClient.put<iPacienteMinResponse>(
-      `${this.API_URL}${this.EDITAR_PACIENTE_PATH}/${pacienteId}`,
+    return this.httpClient.patch<iPacienteMinResponse>(
+      `${this.API_URL}${this.EDITAR_PACIENTE_PATH}${pacienteId}`,
       dados,
     );
   }

@@ -1,1 +1,32 @@
-<app-lista-pacientes />
+<div class="space-y-6 animate-in fade-in duration-500">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Pacientes</h1>
+      <p class="text-slate-500 text-sm mt-1">Gerencie prontuários e dados cadastrais.</p>
+    </div>
+
+    <button
+      type="button"
+      z-button
+      class="bg-teal-700 hover:bg-teal-800 text-white shadow-sm shadow-teal-900/10 transition-all active:scale-95"
+      (click)="abrirCadastro()"
+    >
+      <div class="flex items-center gap-2">
+        <z-icon zType="plus" class="w-4 h-4" />
+        <span>Novo Paciente</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex gap-3">
+      <z-input-group [zAddonBefore]="search" class="mb-4">
+        <input z-input placeholder="Pesquisar..." />
+      </z-input-group>
+    </div>
+
+    <ng-template #search><z-icon zType="search" /></ng-template>
+
+    <app-lista-pacientes #lista />
+  </div>
+</div>

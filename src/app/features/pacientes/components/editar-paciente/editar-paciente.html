@@ -1,0 +1,99 @@
+<form [formGroup]="form" class="flex flex-col gap-6">
+  <div class="border-b border-slate-100 pb-4">
+    <h3 class="text-lg font-semibold text-slate-800">Dados do Paciente</h3>
+    <p class="text-sm text-slate-500">Preencha as informações cadastrais básicas.</p>
+  </div>
+
+  <div class="grid gap-5">
+    <div class="space-y-1.5">
+      <label for="nome" class="text-sm font-medium text-slate-700">Nome Completo</label>
+      <input
+        z-input
+        id="nome"
+        class="w-full px-3 py-2 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all placeholder:text-slate-400"
+        placeholder="Insira o nome do paciente..."
+        formControlName="nome"
+      />
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="space-y-1.5">
+        <label for="email" class="text-sm font-medium text-slate-700">Email</label>
+        <z-input-group [zAddonBefore]="emailTemplate">
+          <input
+            z-input
+            id="email"
+            placeholder="email@email.com"
+            class="w-full py-2 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+            formControlName="email"
+          />
+        </z-input-group>
+        <ng-template #emailTemplate>
+          <div class="flex items-center justify-center h-full">
+            <z-icon zType="mail" class="text-slate-400 w-4 h-4" />
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="telefone" class="text-sm font-medium text-slate-700">Telefone</label>
+        <z-input-group [zAddonBefore]="telefoneTemplate">
+          <input
+            z-input
+            id="telefone"
+            placeholder="(00) 0 0000-0000"
+            mask="(00) 0 0000-0000"
+            class="w-full pl-10 py-2 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+            formControlName="telefone"
+          />
+        </z-input-group>
+        <ng-template #telefoneTemplate>
+          <div class="flex items-center justify-center h-full">
+            <z-icon zType="smartphone" class="text-slate-400 w-4 h-4" />
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="grid gap-4 items-end">
+      <div class="space-y-1.5">
+        <label for="valorSessao" class="text-sm font-medium text-slate-700"
+          >Valor da Sessão (R$)</label
+        >
+        <z-input-group [zAddonBefore]="valorTemplate">
+          <input
+            z-input
+            type="number"
+            id="valorSessao"
+            placeholder="0,00"
+            min="0"
+            class="w-full pl-10 py-2 rounded-lg border border-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all"
+            formControlName="valorSessaoPadrao"
+          />
+        </z-input-group>
+        <ng-template #valorTemplate>
+          <div class="flex items-center justify-center h-full">
+            <z-icon zType="circle-dollar-sign" class="text-slate-400 w-4 h-4" />
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-100">
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
+      (click)="cancelar()"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="px-4 py-2 rounded-lg bg-teal-700 text-white font-medium hover:bg-teal-800 shadow-sm shadow-teal-900/10 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+      (click)="editar()"
+    >
+      Editar paciente
+    </button>
+  </div>
+</form>
