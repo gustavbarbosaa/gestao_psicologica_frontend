@@ -26,6 +26,7 @@ export class ListaPacientes implements OnInit {
   private vcr = inject(ViewContainerRef);
 
   pacientes = signal<iPacienteMaxResponse[]>([]);
+  pacientesFiltrados = signal<iPacienteMaxResponse[]>([]);
 
   ngOnInit(): void {
     this.carregarPacientes();
@@ -34,6 +35,7 @@ export class ListaPacientes implements OnInit {
   public carregarPacientes(): void {
     this.pacienteService.buscarPacientesPorUsuario().subscribe((response) => {
       this.pacientes.set(response);
+      this.pacientesFiltrados.set(response);
     });
   }
 
@@ -61,7 +63,7 @@ export class ListaPacientes implements OnInit {
         },
       });
     } else {
-      const dialogRef = this.dialog.create({
+      this.dialog.create({
         zContent: EditarPaciente,
         zTitle: 'Editar paciente',
         zHideFooter: true,
@@ -83,5 +85,31 @@ export class ListaPacientes implements OnInit {
     }
 
     return (partes[0][0] + partes[1][0]).toUpperCase();
+  }
+
+  filtrarLista(filtros: { nome?: string; ativo?: string }): void {
+    this.pacientesFiltrados.set(
+      this.pacientes().filter((paciente) => {
+        const correspondeNome =
+          !filtros.nome || paciente.nome.toLowerCase().includes(filtros.nome.toLowerCase());
+
+        let correspondeStatus = true;
+
+        if (
+          filtros.ativo !== undefined &&
+          filtros.ativo !== null &&
+          filtros.ativo !== '' &&
+          filtros.ativo !== 'todos'
+        ) {
+          if (filtros.ativo === 'ativo') {
+            correspondeStatus = paciente.ativo === true;
+          } else if (filtros.ativo === 'inativo') {
+            correspondeStatus = paciente.ativo === false;
+          }
+        }
+
+        return correspondeNome && correspondeStatus;
+      }),
+    );
   }
 }

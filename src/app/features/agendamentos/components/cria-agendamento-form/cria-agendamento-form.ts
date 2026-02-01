@@ -9,6 +9,7 @@ import { iAgendamentoRequest, iAgendamentoRequestForm } from '@shared/models/age
 import { ZardIconComponent } from '@shared/components/icon';
 import { PacienteService } from '@core/services/paciente-service';
 import { iPacienteMinResponse } from '@shared/models/paciente.model';
+import { filter, map } from 'rxjs';
 
 @Component({
   selector: 'app-cria-agendamento-form',
@@ -86,15 +87,18 @@ export class CriaAgendamentoForm implements OnInit {
   }
 
   carregarPacientes(): void {
-    this.pacienteService.buscarPacientesPorUsuario().subscribe({
-      next: (pacientes) => {
-        this.pacientes.set(pacientes);
-        this.dadosCarregados.set(true);
-      },
-      error: (err) => {
-        this.dadosCarregados.set(false);
-        console.error('Erro ao carregar pacientes para o formulário de agendamento', err);
-      },
-    });
+    this.pacienteService
+      .buscarPacientesPorUsuario()
+      .pipe(map((pacientes) => pacientes.filter((paciente) => paciente.ativo)))
+      .subscribe({
+        next: (pacientes) => {
+          this.pacientes.set(pacientes);
+          this.dadosCarregados.set(true);
+        },
+        error: (err) => {
+          this.dadosCarregados.set(false);
+          console.error('Erro ao carregar pacientes para o formulário de agendamento', err);
+        },
+      });
   }
 }

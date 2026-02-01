@@ -39,6 +39,12 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
   private destroy$ = new Subject<void>();
 
+  legendasStatus = [
+    { label: 'Pendente', status: 'PENDENTE' },
+    { label: 'Confirmado', status: 'CONFIRMADO' },
+    { label: 'Outros', status: 'DEFAULT' },
+  ];
+
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
 
   ngOnInit(): void {
@@ -97,7 +103,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
           title: agendamento.paciente.nome,
           start: agendamento.dataHoraInicio,
           end: agendamento.dataHoraFim,
-          color: '#0f766e',
+          color: this.getCorAgendamentoPorStatus(agendamento.statusPagamento),
           extendedProps: { agendamento },
         }));
 
@@ -117,7 +123,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       title: agendamento.paciente.nome,
       start: agendamento.dataHoraInicio,
       end: agendamento.dataHoraFim,
-      color: '#0f766e',
+      color: this.getCorAgendamentoPorStatus(agendamento.statusPagamento),
       extendedProps: { agendamento },
     };
 
@@ -134,7 +140,8 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       title: agendamento.paciente.nome,
       start: agendamento.dataHoraInicio,
       end: agendamento.dataHoraFim,
-      color: '#0f766e',
+      color: this.getCorAgendamentoPorStatus(agendamento.statusPagamento),
+      statusPagamento: agendamento.statusPagamento,
       extendedProps: { agendamento },
     };
 
@@ -318,5 +325,16 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         console.error('Erro ao criar agendamento', err);
       },
     });
+  }
+
+  getCorAgendamentoPorStatus(statusPagamento: string): string {
+    switch (statusPagamento) {
+      case 'PENDENTE':
+        return '#FFA500';
+      case 'CONFIRMADO':
+        return '#4CAF50';
+      default:
+        return '#9E9E9E';
+    }
   }
 }

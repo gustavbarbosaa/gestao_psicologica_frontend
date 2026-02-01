@@ -18,15 +18,24 @@
     </button>
   </div>
 
-  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+  <form
+    [formGroup]="formFiltro"
+    class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+  >
     <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex gap-3">
       <z-input-group [zAddonBefore]="search" class="mb-4">
-        <input z-input placeholder="Pesquisar..." />
+        <input z-input placeholder="Pesquisar..." formControlName="nome" />
       </z-input-group>
+
+      <z-select class="flex-1" zPlaceholder="Status" formControlName="ativo">
+        <z-select-item zValue="todos">Todos</z-select-item>
+        <z-select-item zValue="ativo">Ativo</z-select-item>
+        <z-select-item zValue="inativo">Inativo</z-select-item>
+      </z-select>
     </div>
 
     <ng-template #search><z-icon zType="search" /></ng-template>
 
     <app-lista-pacientes #lista />
-  </div>
+  </form>
 </div>
