@@ -30,12 +30,12 @@ interface IModalData {
   providers: [provideNgxMask()],
 })
 export class CadastroPaciente implements OnInit {
-  private pacienteService = inject(PacienteService);
-  private toastService = inject(ToastService);
-  private dialogRef = inject<ZardDialogRef<CadastroPaciente>>(ZardDialogRef as any);
-  private data = inject<IModalData>(Z_MODAL_DATA as any);
+  private readonly pacienteService = inject(PacienteService);
+  private readonly toastService = inject(ToastService);
+  private readonly dialogRef = inject<ZardDialogRef<CadastroPaciente>>(ZardDialogRef as any);
+  private readonly data = inject<IModalData>(Z_MODAL_DATA as any);
+  private readonly fb = inject(FormBuilder);
 
-  private fb = inject(FormBuilder);
   form!: FormGroup;
 
   ngOnInit(): void {
@@ -43,7 +43,6 @@ export class CadastroPaciente implements OnInit {
       nome: ['', [Validators.required]],
       email: ['', [Validators.email]],
       telefone: ['', [Validators.required]],
-      valorSessaoPadrao: [0, [Validators.min(0)]],
     });
   }
 

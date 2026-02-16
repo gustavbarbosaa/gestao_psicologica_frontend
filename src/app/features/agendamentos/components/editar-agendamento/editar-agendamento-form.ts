@@ -9,6 +9,8 @@ import { iPacienteMinResponse } from '@shared/models/paciente.model';
 import { Z_MODAL_DATA } from '@shared/components/dialog/dialog.service';
 import { LoginService } from '@core/services/login-service';
 import { PacienteService } from '@core/services/paciente-service';
+import { TipoAtendimentoService } from '@core/services/tipo-atendimento';
+import { iTipoAtendimento } from '@shared/models/tipo-atendimento.model';
 
 @Component({
   selector: 'app-editar-agendamento',
@@ -24,14 +26,15 @@ import { PacienteService } from '@core/services/paciente-service';
 })
 export class EditarAgendamentoForm implements OnInit {
   public form!: FormGroup;
-  private formBuilder = inject(NonNullableFormBuilder);
-
-  private modalData = inject(Z_MODAL_DATA) as Partial<iAgendamentoRequestForm> | undefined;
-  private loginService = inject(LoginService);
-  private pacienteService = inject(PacienteService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly loginService = inject(LoginService);
+  private readonly pacienteService = inject(PacienteService);
+  private readonly tipoAtendimentoService = inject(TipoAtendimentoService);
+  private readonly modalData = inject(Z_MODAL_DATA) as Partial<iAgendamentoRequestForm> | undefined;
 
   public dadosCarregados = signal<boolean>(false);
   public pacientes = signal<iPacienteMinResponse[]>([]);
+  public tipoAtendimentos = signal<iTipoAtendimento[]>([]);
 
   ngOnInit(): void {
     this.iniciarForm();
@@ -39,12 +42,14 @@ export class EditarAgendamentoForm implements OnInit {
 
   private iniciarForm(): void {
     this.carregarPacientes();
+    this.carregarTiposAtendimentos();
 
     this.form = this.formBuilder.group<iAgendamentoRequestForm>({
       dataHoraInicio: this.formBuilder.control('', Validators.required),
       duracaoEmMinutos: this.formBuilder.control(60, [Validators.required, Validators.min(15)]),
       pacienteId: this.formBuilder.control('', Validators.required),
       usuarioId: this.formBuilder.control(this.getUsuarioId(), Validators.required),
+      tipoAtendimentoId: this.formBuilder.control('', Validators.required),
     });
 
     if (this.modalData && this.modalData.dataHoraInicio) {
@@ -56,7 +61,7 @@ export class EditarAgendamentoForm implements OnInit {
         dataRecebida.setMinutes(dataRecebida.getMinutes() + dataRecebida.getTimezoneOffset());
       }
 
-      if (!isNaN(dataRecebida.getTime())) {
+      if (!Number.isNaN(dataRecebida.getTime())) {
         const offset = dataRecebida.getTimezoneOffset() * 60000;
         const dataLocal = new Date(dataRecebida.getTime() - offset);
         const dataFormatada = dataLocal.toISOString().slice(0, 16);
@@ -65,12 +70,16 @@ export class EditarAgendamentoForm implements OnInit {
       }
     }
 
-    if (typeof this.modalData?.duracaoEmMinutos !== 'undefined') {
-      this.form.patchValue({ duracaoEmMinutos: this.modalData!.duracaoEmMinutos });
+    if (this.modalData?.duracaoEmMinutos !== undefined) {
+      this.form.patchValue({ duracaoEmMinutos: this.modalData.duracaoEmMinutos });
     }
 
     if (this.modalData?.pacienteId) {
       this.form.patchValue({ pacienteId: this.modalData.pacienteId });
+    }
+
+    if (this.modalData?.tipoAtendimentoId) {
+      this.form.patchValue({ tipoAtendimentoId: this.modalData.tipoAtendimentoId });
     }
   }
 
@@ -93,6 +102,22 @@ export class EditarAgendamentoForm implements OnInit {
       error: (err) => {
         this.dadosCarregados.set(false);
         console.error('Erro ao carregar pacientes para o formulário de edição', err);
+      },
+    });
+  }
+
+  carregarTiposAtendimentos() {
+    this.tipoAtendimentoService.buscarTiposAtendimentos().subscribe({
+      next: (dados) => {
+        this.tipoAtendimentos.set(dados);
+        this.dadosCarregados.set(true);
+      },
+      error: (err) => {
+        console.error(
+          'Erro ao carregar os tipos de atendimento para o formulário de agendamento',
+          err,
+        );
+        this.dadosCarregados.set(false);
       },
     });
   }

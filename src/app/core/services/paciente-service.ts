@@ -12,11 +12,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class PacienteService {
-  private httpClient: HttpClient = inject(HttpClient);
-  private API_URL: string = environment.apiUrl;
-  private PACIENTES_PATH: string = '/paciente';
-  private PACIENTES_POR_USUARIO_PATH: string = `${this.PACIENTES_PATH}/por-usuario`;
-  private EDITAR_PACIENTE_PATH: string = `${this.PACIENTES_PATH}/editar/`;
+  private readonly httpClient: HttpClient = inject(HttpClient);
+  private readonly API_URL: string = environment.apiUrl;
+  private readonly PACIENTES_PATH: string = '/paciente';
+  private readonly PACIENTES_POR_USUARIO_PATH: string = `${this.PACIENTES_PATH}/por-usuario`;
+  private readonly EDITAR_PACIENTE_PATH: string = `${this.PACIENTES_PATH}/editar/`;
 
   public buscarPacientePorId(pacienteId: string): Observable<iPacienteMinResponse> {
     return this.httpClient.get<iPacienteMinResponse>(

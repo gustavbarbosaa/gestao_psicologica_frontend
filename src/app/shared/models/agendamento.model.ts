@@ -23,4 +23,5 @@ export interface iAgendamentoRequestForm {
   duracaoEmMinutos: AbstractControl<number>;
   pacienteId: AbstractControl<string>;
   usuarioId: AbstractControl<string>;
+  tipoAtendimentoId: AbstractControl<string>;
 }

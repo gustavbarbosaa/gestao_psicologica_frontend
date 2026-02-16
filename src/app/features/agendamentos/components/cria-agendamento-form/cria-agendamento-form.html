@@ -78,5 +78,31 @@
         </div>
       </div>
     </div>
+
+    <div class="space-y-1.5">
+      <label for="pacienteId" class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <z-icon zType="user" class="w-4 h-4 text-primary" />
+        Tipo de atendimento
+      </label>
+      <div class="relative">
+        @if (dadosCarregados()) {
+          <z-select
+            formControlName="tipoAtendimentoId"
+            zPlaceholder="Selecione o tipo de atendimento..."
+            class="w-full block"
+          >
+            @for (tipoAtendimento of tiposAtendimentos(); track tipoAtendimento.id) {
+              <z-select-item [zValue]="tipoAtendimento.id">{{
+                tipoAtendimento.nome
+              }}</z-select-item>
+            }
+          </z-select>
+        } @else {
+          <div
+            class="animate-pulse bg-slate-100 h-10 w-full rounded-lg border border-slate-200"
+          ></div>
+        }
+      </div>
+    </div>
   </form>
 </div>

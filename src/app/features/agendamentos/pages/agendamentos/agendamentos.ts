@@ -29,19 +29,20 @@ import { EditarAgendamentoForm } from '@features/agendamentos/components/editar-
   styleUrl: './agendamentos.css',
 })
 export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
-  private dialogService = inject(ZardDialogService);
-  private agendamentoService = inject(AgendamentoService);
-  private toastService = inject(ToastService);
-  private DURACAO_PADRAO_EM_MINUTOS = 60;
+  private readonly dialogService = inject(ZardDialogService);
+  private readonly agendamentoService = inject(AgendamentoService);
+  private readonly toastService = inject(ToastService);
+  private readonly DURACAO_PADRAO_EM_MINUTOS = 60;
 
   protected calendarOptions!: CalendarOptions;
   protected eventosCalendario = signal<any[]>([]);
 
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   legendasStatus = [
     { label: 'Pendente', status: 'PENDENTE' },
     { label: 'Confirmado', status: 'CONFIRMADO' },
+    { label: 'Cobrança Gerada', status: 'COBRANCA_GERADA' },
     { label: 'Outros', status: 'DEFAULT' },
   ];
 
@@ -75,6 +76,44 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       locales: [ptBrLocale],
       dateClick: (arg: DateClickArg) => this.handleDateClick(arg),
       eventDisplay: 'block',
+      eventContent: function (arg) {
+        let horarioTermino = arg.event.extendedProps['agendamento']['dataHoraFim'];
+        let data = new Date(horarioTermino);
+        let hora = data.getHours();
+        let minutos = data.getMinutes();
+        let horarioFormatado = `${hora.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
+
+        let icon = '';
+
+        switch (arg.event.extendedProps['agendamento']['statusPagamento']) {
+          case 'PENDENTE':
+            icon = 'fa-clock';
+            break;
+          case 'CONFIRMADO':
+            icon = 'fa-check';
+            break;
+          case 'COBRANCA':
+            icon = 'fa-dollar-sign';
+            break;
+        }
+
+        return {
+          html: `
+            <div class="flex items-start gap-2 px-2 py-1">
+              <i class="fas fa-user mt-0.5 text-xs"></i>
+              <div class="flex flex-col leading-tight">
+                <span class="text-sm font-medium">
+                  ${arg.event.title}
+                </span>
+                <small class="text-xs opacity-80">
+                  ${arg.timeText} - ${horarioFormatado}
+                </small>
+              </div>
+              <i class="fas ${icon} ml-auto text-xs opacity-70"></i>
+            </div>
+          `,
+        };
+      },
       eventClick: (arg: EventClickArg) => this.handleEventClick(arg),
       headerToolbar: {
         left: 'prev,next today',
@@ -178,7 +217,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       zOkText: 'Salvar',
       zCancelText: 'Cancelar',
       zOnOk: (instance) => {
-        const form = (instance as CriaAgendamentoForm).form;
+        const form = instance.form;
 
         if (form.valid) {
           const payload = form.getRawValue() as iAgendamentoRequest;
@@ -209,7 +248,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       zOkText: 'Salvar',
       zCancelText: 'Cancelar',
       zOnOk: (instance) => {
-        const form = (instance as EditarAgendamentoForm).form;
+        const form = instance.form;
 
         if (form.valid) {
           const payload = form.getRawValue() as iAgendamentoRequest;
@@ -267,13 +306,14 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         ),
         pacienteId: agendamento.paciente?.id || '',
         usuarioId: agendamento.usuario?.id || '',
+        tipoAtendimentoId: agendamento.tipoAtendimento?.id || '',
       },
       zOkIcon: 'check',
       zCancelIcon: 'x',
       zOkText: 'Salvar',
       zCancelText: 'Cancelar',
       zOnOk: (instance) => {
-        const form = (instance as EditarAgendamentoForm).form;
+        const form = instance.form;
 
         if (form.valid) {
           const payload = form.getRawValue() as iAgendamentoRequest;
@@ -333,6 +373,8 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         return '#FFA500';
       case 'CONFIRMADO':
         return '#4CAF50';
+      case 'COBRANCA_GERADA':
+        return '#0288D1';
       default:
         return '#9E9E9E';
     }

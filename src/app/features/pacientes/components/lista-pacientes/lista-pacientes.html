@@ -6,7 +6,6 @@
       >
         <th class="px-6 py-4">Paciente</th>
         <th class="px-6 py-4">Contato</th>
-        <th class="px-6 py-4">Valor Sessão</th>
         <th class="px-6 py-4 text-center">Status</th>
         <th class="px-6 py-4 text-right">Ações</th>
       </tr>
@@ -40,10 +39,6 @@
                 <span>{{ paciente.telefone | mask: '(00) 0 0000-0000' }}</span>
               </div>
             </div>
-          </td>
-
-          <td class="px-6 py-4 text-sm text-slate-600 font-medium">
-            {{ paciente.valorSessaoPadrao | currency: 'BRL' }}
           </td>
 
           <td class="px-6 py-4 text-center">

@@ -1,8 +1,7 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewContainerRef } from '@angular/core';
 import { ZardIconComponent } from '@shared/components/icon';
 import { PacienteService } from '@core/services/paciente-service';
 import { ZardDialogService } from '@shared/components/dialog/dialog.service';
-import { ViewContainerRef } from '@angular/core';
 import { CadastroPaciente } from '../cadastro-paciente/cadastro-paciente';
 import { LoginService } from '@core/services/login-service';
 import { iPacienteMaxResponse } from '@shared/models/paciente.model';
@@ -22,8 +21,8 @@ export class ListaPacientes implements OnInit {
   pacienteService = inject(PacienteService);
   usuarioService = inject(LoginService);
   toastService = inject(ToastService);
-  private dialog = inject(ZardDialogService);
-  private vcr = inject(ViewContainerRef);
+  private readonly dialog = inject(ZardDialogService);
+  private readonly vcr = inject(ViewContainerRef);
 
   pacientes = signal<iPacienteMaxResponse[]>([]);
   pacientesFiltrados = signal<iPacienteMaxResponse[]>([]);
@@ -52,7 +51,7 @@ export class ListaPacientes implements OnInit {
   }
 
   abrirModal(pacienteId: string): void {
-    if (!pacienteId) {
+    if (pacienteId === null) {
       this.dialog.create({
         zContent: CadastroPaciente,
         zTitle: 'Novo paciente',

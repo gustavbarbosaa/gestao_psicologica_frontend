@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { PacienteService } from '@core/services/paciente-service';
 import { ZardDialogRef } from '@shared/components/dialog/dialog-ref';
 import { ToastService } from '@shared/services/toast-service';
-import { CadastroPaciente } from '../cadastro-paciente/cadastro-paciente';
 import { Z_MODAL_DATA } from '@shared/components/dialog/dialog.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { iPacienteRequest } from '@shared/models/paciente.model';
@@ -31,12 +30,12 @@ interface IModalData {
   providers: [provideNgxMask()],
 })
 export class EditarPaciente implements OnInit {
-  private pacienteService = inject(PacienteService);
-  private toastService = inject(ToastService);
-  private dialogRef = inject<ZardDialogRef<EditarPaciente>>(ZardDialogRef as any);
-  private data = inject<IModalData>(Z_MODAL_DATA as any);
+  private readonly pacienteService = inject(PacienteService);
+  private readonly toastService = inject(ToastService);
+  private readonly dialogRef = inject<ZardDialogRef<EditarPaciente>>(ZardDialogRef as any);
+  private readonly fb = inject(FormBuilder);
+  private readonly data = inject<IModalData>(Z_MODAL_DATA as any);
 
-  private fb = inject(FormBuilder);
   form!: FormGroup;
 
   ngOnInit(): void {
@@ -44,20 +43,16 @@ export class EditarPaciente implements OnInit {
       nome: ['', [Validators.required]],
       email: ['', [Validators.email]],
       telefone: ['', [Validators.required]],
-      valorSessaoPadrao: [0, [Validators.min(0)]],
     });
 
     const pacienteId = this.data.pacienteId;
 
     this.pacienteService.buscarPacientePorIdDetalhado(pacienteId!).subscribe({
       next: (paciente) => {
-        console.log('paciente', paciente);
-
         this.form.patchValue({
           nome: paciente.nome,
           email: paciente.email,
           telefone: paciente.telefone,
-          valorSessaoPadrao: paciente.valorSessaoPadrao,
         });
       },
       error: () => {
