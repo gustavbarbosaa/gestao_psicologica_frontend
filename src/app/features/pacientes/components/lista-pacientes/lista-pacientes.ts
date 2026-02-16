@@ -7,13 +7,13 @@ import { LoginService } from '@core/services/login-service';
 import { iPacienteMaxResponse } from '@shared/models/paciente.model';
 import { ToastService } from '@shared/services/toast-service';
 import { ZardTableImports } from '@shared/components/table';
-import { CurrencyPipe, NgClass } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { NgxMaskPipe } from 'ngx-mask';
 import { EditarPaciente } from '../editar-paciente/editar-paciente';
 
 @Component({
   selector: 'app-lista-pacientes',
-  imports: [ZardTableImports, ZardIconComponent, NgClass, CurrencyPipe, NgxMaskPipe],
+  imports: [ZardTableImports, ZardIconComponent, NgClass, NgxMaskPipe],
   templateUrl: './lista-pacientes.html',
   styleUrl: './lista-pacientes.css',
 })
