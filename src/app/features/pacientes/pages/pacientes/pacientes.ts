@@ -26,13 +26,13 @@ import { CommonModule } from '@angular/common';
   styleUrl: './pacientes.css',
 })
 export class Pacientes implements OnInit {
-  private dialog = inject(ZardDialogService);
-  private fb = inject(FormBuilder);
+  private readonly dialog = inject(ZardDialogService);
+  private readonly fb = inject(FormBuilder);
 
   formFiltro!: FormGroup;
 
   @ViewChild('lista') lista?: ListaPacientes;
-  private vcr = inject(ViewContainerRef);
+  private readonly vcr = inject(ViewContainerRef);
 
   ngOnInit(): void {
     this.iniciarForm();

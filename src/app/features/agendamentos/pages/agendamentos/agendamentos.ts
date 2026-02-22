@@ -99,7 +99,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
         return {
           html: `
-            <div class="flex items-start gap-2 px-2 py-1">
+            <div class="flex items-start justify-center gap-2 px-2 py-1 cursor-pointer">
               <i class="fas fa-user mt-0.5 text-xs"></i>
               <div class="flex flex-col leading-tight">
                 <span class="text-sm font-medium">

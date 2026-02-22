@@ -33,6 +33,11 @@ export class MenuPrincipal implements OnInit {
         url: '/agendamentos',
       },
       {
+        icone: 'settings',
+        titulo: 'Tipos de atendimento',
+        url: '/tipos-atendimento',
+      },
+      {
         icone: 'users',
         titulo: 'Pacientes',
         url: '/pacientes',
@@ -40,11 +45,6 @@ export class MenuPrincipal implements OnInit {
       {
         icone: 'circle-dollar-sign',
         titulo: 'Financeiro',
-        url: '#',
-      },
-      {
-        icone: 'file-text',
-        titulo: 'Relatórios',
         url: '#',
       },
     ];

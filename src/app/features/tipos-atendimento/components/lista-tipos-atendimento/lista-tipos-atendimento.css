@@ -1,0 +1,8 @@
+.table-auto th,
+.table-auto td {
+  padding: 8px 12px;
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}

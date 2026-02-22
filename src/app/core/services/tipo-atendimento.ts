@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
-import { iTipoAtendimento } from '@shared/models/tipo-atendimento.model';
+import { iTipoAtendimento, iTipoAtendimentoRequest } from '@shared/models/tipo-atendimento.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -22,7 +22,7 @@ export class TipoAtendimentoService {
     );
   }
 
-  public criarTipoAtendimento(dados: iTipoAtendimento): Observable<iTipoAtendimento> {
+  public criarTipoAtendimento(dados: iTipoAtendimentoRequest): Observable<iTipoAtendimento> {
     return this.httpClient.post<iTipoAtendimento>(
       `${this.API_URL}${this.TIPO_ATENDIMENTO_PATH}`,
       dados,
@@ -37,7 +37,7 @@ export class TipoAtendimentoService {
 
   public editarTipoAtendimento(
     tipoAtendimentoId: string,
-    dados: iTipoAtendimento,
+    dados: iTipoAtendimentoRequest,
   ): Observable<iTipoAtendimento> {
     return this.httpClient.patch<iTipoAtendimento>(
       `${this.API_URL}${this.TIPO_ATENDIMENTO_PATH}/${tipoAtendimentoId}`,

@@ -31,6 +31,14 @@ export const routes: Routes = [
     canMatch: [authGuard],
   },
   {
+    path: 'tipos-atendimento',
+    loadComponent: () =>
+      import('./features/tipos-atendimento/pages/tipos-atendimento/tipos-atendimento').then(
+        (m) => m.TiposAtendimento,
+      ),
+    canMatch: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },
