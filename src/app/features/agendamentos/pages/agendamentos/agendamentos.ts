@@ -11,7 +11,7 @@ import {
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import interactionPlugin, { DateClickArg, EventResizeDoneArg } from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import ptBrLocale from '@fullcalendar/core/locales/pt-br';
 import { ZardDialogService } from '@shared/components/dialog/dialog.service';
@@ -20,6 +20,7 @@ import { iAgendamentoRequest } from '@shared/models/agendamento.model';
 import { AgendamentoService } from '@core/services/agendamento-service';
 import { ToastService } from '@shared/services/toast-service';
 import { Subject, takeUntil } from 'rxjs';
+import { TipoAtendimentoService } from '@core/services/tipo-atendimento';
 import { EditarAgendamentoForm } from '@features/agendamentos/components/editar-agendamento/editar-agendamento-form';
 
 @Component({
@@ -32,6 +33,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   private readonly dialogService = inject(ZardDialogService);
   private readonly agendamentoService = inject(AgendamentoService);
   private readonly toastService = inject(ToastService);
+  private readonly tipoAtendimentoService = inject(TipoAtendimentoService);
   private readonly DURACAO_PADRAO_EM_MINUTOS = 60;
 
   protected calendarOptions!: CalendarOptions;
@@ -69,21 +71,20 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
   private iniciarCalendario(): CalendarOptions {
     return {
-      initialView: 'dayGridMonth',
+      initialView: 'timeGridWeek',
       plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
       weekends: false,
       locale: ptBrLocale,
       locales: [ptBrLocale],
+      editable: true,
+      eventDurationEditable: true,
+      eventDrop: (arg) => this.handleEventResizeOrDrop(arg),
+      eventResize: (arg) => this.handleEventResizeOrDrop(arg),
       dateClick: (arg: DateClickArg) => this.handleDateClick(arg),
       eventDisplay: 'block',
       eventContent: function (arg) {
-        let horarioTermino = arg.event.extendedProps['agendamento']['dataHoraFim'];
-        let data = new Date(horarioTermino);
-        let hora = data.getHours();
-        let minutos = data.getMinutes();
-        let horarioFormatado = `${hora.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}`;
-
         let icon = '';
+        let iconTipoAtendimento = '';
 
         switch (arg.event.extendedProps['agendamento']['statusPagamento']) {
           case 'PENDENTE':
@@ -97,16 +98,25 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
             break;
         }
 
+        switch (arg.event.extendedProps['agendamento']['tipoAtendimento']?.nome) {
+          case 'PRESENCIAL':
+            iconTipoAtendimento = 'fa-building';
+            break;
+          case 'ONLINE':
+            iconTipoAtendimento = 'fa-video';
+            break;
+        }
+
         return {
           html: `
             <div class="flex items-start justify-center gap-2 px-2 py-1 cursor-pointer">
-              <i class="fas fa-user mt-0.5 text-xs"></i>
+              <i class="fas ${iconTipoAtendimento} mt-0.5 text-xs"></i>
               <div class="flex flex-col leading-tight">
                 <span class="text-sm font-medium">
                   ${arg.event.title}
                 </span>
                 <small class="text-xs opacity-80">
-                  ${arg.timeText} - ${horarioFormatado}
+                  ${arg.timeText}
                 </small>
               </div>
               <i class="fas ${icon} ml-auto text-xs opacity-70"></i>
@@ -132,6 +142,35 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         meridiem: false,
       },
     };
+  }
+
+  handleEventResizeOrDrop(arg: EventResizeDoneArg | EventClickArg): void {
+    const agendamento: any = (arg.event.extendedProps as any)?.agendamento;
+    const agendamentoRequest: iAgendamentoRequest = {
+      dataHoraInicio: arg.event.start?.toISOString() || '',
+      duracaoEmMinutos: Math.round((arg.event.end!.getTime() - arg.event.start!.getTime()) / 60000),
+      usuarioId: agendamento.usuario?.id || '',
+      pacienteId: agendamento.paciente?.id || '',
+      tipoAtendimentoId: agendamento.tipoAtendimento?.id || '',
+    };
+
+    this.agendamentoService.editarAgendamento(arg.event.id, agendamentoRequest).subscribe({
+      next: (response) => {
+        this.toastService.exibirToastSucesso(
+          'Agendamento atualizado',
+          `Agendamento para ${response.paciente.nome} atualizado.`,
+        );
+      },
+      error: (err) => {
+        const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Erro inesperado';
+
+        this.toastService.exibirToastErro(
+          'Erro',
+          'Não foi possível atualizar o agendamento: ' + mensagem,
+        );
+        console.error('Erro ao editar agendamento', err);
+      },
+    });
   }
 
   carregarAgendamentosIniciais(): void {
@@ -299,10 +338,9 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       zContent: EditarAgendamentoForm,
       zData: {
         dataHoraInicio: agendamento.dataHoraInicio,
-        duracaoEmMinutos: Math.round(
-          (new Date(agendamento.dataHoraFim).getTime() -
-            new Date(agendamento.dataHoraInicio).getTime()) /
-            60000,
+        duracaoEmMinutos: this.calculaDuracaoEmMinutos(
+          agendamento.dataHoraInicio,
+          agendamento.dataHoraFim,
         ),
         pacienteId: agendamento.paciente?.id || '',
         usuarioId: agendamento.usuario?.id || '',
@@ -323,12 +361,41 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
                 'Agendamento atualizado',
                 `Agendamento para ${updated.paciente.nome} atualizado.`,
               );
-              const evt = this.calendarComponent.getApi().getEventById(updated.id);
-              if (evt) {
-                evt.setProp('title', updated.paciente.nome);
-                evt.setStart(updated.dataHoraInicio);
-                evt.setEnd(updated.dataHoraFim);
-                (evt as any).setExtendedProp('agendamento', updated);
+
+              const applyUpdated = (ag: any) => {
+                const api = this.calendarComponent.getApi();
+                const existing = api.getEventById(ag.id);
+
+                const eventoFormatado = {
+                  id: ag.id,
+                  title: ag.paciente.nome,
+                  start: ag.dataHoraInicio,
+                  end: ag.dataHoraFim,
+                  color: this.getCorAgendamentoPorStatus(ag.statusPagamento),
+                  extendedProps: { agendamento: ag },
+                };
+
+                if (existing) {
+                  existing.remove();
+                }
+
+                api.addEvent(eventoFormatado);
+              };
+
+              if (!updated.tipoAtendimento && (updated as any).tipoAtendimentoId) {
+                this.tipoAtendimentoService
+                  .buscarTipoAtendimentoPorId((updated as any).tipoAtendimentoId)
+                  .subscribe({
+                    next: (tipo) => {
+                      (updated as any).tipoAtendimento = tipo;
+                      applyUpdated(updated);
+                    },
+                    error: () => {
+                      applyUpdated(updated);
+                    },
+                  });
+              } else {
+                applyUpdated(updated);
               }
             },
             error: (err) => {
@@ -378,5 +445,11 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       default:
         return '#9E9E9E';
     }
+  }
+
+  private calculaDuracaoEmMinutos(dataHoraInicio: string, dataHoraFim: string): number {
+    return Math.round(
+      (new Date(dataHoraFim).getTime() - new Date(dataHoraInicio).getTime()) / 60000,
+    );
   }
 }

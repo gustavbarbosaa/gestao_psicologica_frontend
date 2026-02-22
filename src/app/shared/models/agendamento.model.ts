@@ -1,6 +1,7 @@
 import { AbstractControl } from '@angular/forms';
 import { iLoginResponse } from './login.model';
 import { iPacienteMinResponse } from './paciente.model';
+import { iTipoAtendimento } from './tipo-atendimento.model';
 
 export interface iAgendamentoResponse {
   id: string;
@@ -9,6 +10,7 @@ export interface iAgendamentoResponse {
   dataHoraFim: string;
   paciente: iPacienteMinResponse;
   usuario: iLoginResponse;
+  tipoAtendimento: iTipoAtendimento;
 }
 
 export interface iAgendamentoRequest {
@@ -16,6 +18,7 @@ export interface iAgendamentoRequest {
   duracaoEmMinutos: number;
   pacienteId: string;
   usuarioId: string;
+  tipoAtendimentoId: string;
 }
 
 export interface iAgendamentoRequestForm {
