@@ -9,7 +9,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
+import { CalendarOptions, EventClickArg, EventContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg, EventResizeDoneArg } from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -83,48 +83,12 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       eventResize: (arg) => this.handleEventResizeOrDrop(arg),
       dateClick: (arg: DateClickArg) => this.handleDateClick(arg),
       eventDisplay: 'block',
-      eventContent: function (arg) {
-        let icon = '';
-        let iconTipoAtendimento = '';
+      eventClassNames: function (arg) {
+        const status = arg.event.extendedProps['agendamento'].statusAtendimento;
 
-        switch (arg.event.extendedProps['agendamento']['statusPagamento']) {
-          case 'PENDENTE':
-            icon = 'fa-clock';
-            break;
-          case 'CONFIRMADO':
-            icon = 'fa-check';
-            break;
-          case 'COBRANCA':
-            icon = 'fa-dollar-sign';
-            break;
-        }
-
-        switch (arg.event.extendedProps['agendamento']['tipoAtendimento']?.nome) {
-          case 'PRESENCIAL':
-            iconTipoAtendimento = 'fa-building';
-            break;
-          case 'ONLINE':
-            iconTipoAtendimento = 'fa-video';
-            break;
-        }
-
-        return {
-          html: `
-            <div class="flex items-start justify-center gap-2 px-2 py-1 cursor-pointer">
-              <i class="fas ${iconTipoAtendimento} mt-0.5 text-xs"></i>
-              <div class="flex flex-col leading-tight">
-                <span class="text-sm font-medium">
-                  ${arg.event.title}
-                </span>
-                <small class="text-xs opacity-80">
-                  ${arg.timeText}
-                </small>
-              </div>
-              <i class="fas ${icon} ml-auto text-xs opacity-70"></i>
-            </div>
-          `,
-        };
+        return ['status-' + status.toLowerCase()];
       },
+      eventContent: (arg) => this.criaCardEventAgenddamento(arg),
       eventClick: (arg: EventClickArg) => this.handleEventClick(arg),
       headerToolbar: {
         left: 'prev,next today',
@@ -458,5 +422,106 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
     const fim = parseISO(dataHoraFim);
 
     return differenceInMinutes(fim, inicio);
+  }
+
+  private criaCardEventAgenddamento(arg: EventContentArg) {
+    const agendamento = arg.event.extendedProps['agendamento'];
+
+    let iconPagamento = '';
+    let iconTipo = '';
+    let statusBorderClass = '';
+
+    switch (agendamento.statusPagamento) {
+      case 'PENDENTE':
+        iconPagamento = 'fa-clock';
+        break;
+      case 'CONFIRMADO':
+        iconPagamento = 'fa-check';
+        break;
+      case 'COBRANCA_GERADA':
+        iconPagamento = 'fa-dollar-sign';
+        break;
+    }
+
+    switch (agendamento.tipoAtendimento?.nome) {
+      case 'PRESENCIAL':
+        iconTipo = 'fa-building';
+        break;
+      case 'ONLINE':
+        iconTipo = 'fa-video';
+        break;
+    }
+
+    switch (agendamento.statusAtendimento) {
+      case 'CONFIRMADO':
+        statusBorderClass = 'border-primary';
+        break;
+
+      case 'CANCELADO':
+        statusBorderClass = 'border-destructive';
+        break;
+
+      case 'EM_ANDAMENTO':
+        statusBorderClass = 'border-chart-5';
+        break;
+
+      case 'CONCLUIDO':
+        statusBorderClass = 'border-secondary-foreground';
+        break;
+
+      case 'REAGENDADO':
+        statusBorderClass = 'border-chart-3';
+        break;
+
+      default:
+        statusBorderClass = 'border-muted-foreground';
+    }
+
+    return {
+      html: `
+    <div class="
+      h-full
+      flex flex-col
+      px-2 py-1
+      bg-card
+      text-card-foreground
+      border border-border
+      border-l-4 ${statusBorderClass}
+      rounded-lg
+      shadow-sm
+      hover:bg-accent
+      hover:shadow-md
+      transition-all
+      overflow-hidden
+    ">
+
+      <div class="flex items-start gap-1.5 min-w-0">
+
+        <i class="fas ${iconTipo} text-xs text-muted-foreground shrink-0 mt-0.5"></i>
+
+        <span class="text-sm font-medium truncate">
+          ${arg.event.title}
+        </span>
+
+        <i class="fas ${iconPagamento} text-xs text-muted-foreground/70 shrink-0 ml-auto mt-0.5"></i>
+
+      </div>
+
+      <div class="
+        flex items-center gap-1
+        text-xs text-muted-foreground
+        mt-0.5
+        truncate
+      ">
+        <span class="whitespace-nowrap">${arg.timeText}</span>
+        <span>•</span>
+        <span class="font-medium truncate">
+          ${agendamento.statusAtendimento}
+        </span>
+      </div>
+
+    </div>
+  `,
+    };
   }
 }
