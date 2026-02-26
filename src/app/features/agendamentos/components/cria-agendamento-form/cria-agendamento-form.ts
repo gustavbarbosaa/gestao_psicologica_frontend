@@ -12,6 +12,7 @@ import { iPacienteMinResponse } from '@shared/models/paciente.model';
 import { map } from 'rxjs';
 import { TipoAtendimentoService } from '@core/services/tipo-atendimento';
 import { iTipoAtendimento } from '@shared/models/tipo-atendimento.model';
+import { format, parseISO, isValid } from 'date-fns';
 
 @Component({
   selector: 'app-cria-agendamento-form',
@@ -56,19 +57,13 @@ export class CriaAgendamentoForm implements OnInit {
     });
 
     if (this.modalData && this.modalData.dataHoraInicio) {
-      const dataRecebida = new Date(this.modalData.dataHoraInicio);
+      const dataRecebida =
+        typeof this.modalData.dataHoraInicio === 'string'
+          ? parseISO(this.modalData.dataHoraInicio)
+          : this.modalData.dataHoraInicio;
 
-      const isMidnightUTC = dataRecebida.getUTCHours() === 0 && dataRecebida.getUTCMinutes() === 0;
-
-      if (isMidnightUTC) {
-        dataRecebida.setMinutes(dataRecebida.getMinutes() + dataRecebida.getTimezoneOffset());
-      }
-
-      if (!Number.isNaN(dataRecebida.getTime())) {
-        const offset = dataRecebida.getTimezoneOffset() * 60000;
-        const dataLocal = new Date(dataRecebida.getTime() - offset);
-        const dataFormatada = dataLocal.toISOString().slice(0, 16);
-
+      if (isValid(dataRecebida)) {
+        const dataFormatada = format(dataRecebida, "yyyy-MM-dd'T'HH:mm");
         this.form.patchValue({ dataHoraInicio: dataFormatada });
       }
     }

@@ -22,6 +22,7 @@ import { ToastService } from '@shared/services/toast-service';
 import { Subject, takeUntil } from 'rxjs';
 import { TipoAtendimentoService } from '@core/services/tipo-atendimento';
 import { EditarAgendamentoForm } from '@features/agendamentos/components/editar-agendamento/editar-agendamento-form';
+import { format, differenceInMinutes, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-agendamentos',
@@ -146,9 +147,13 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
   handleEventResizeOrDrop(arg: EventResizeDoneArg | EventClickArg): void {
     const agendamento: any = (arg.event.extendedProps as any)?.agendamento;
+
+    const dataHoraInicio = arg.event.start ? format(arg.event.start, "yyyy-MM-dd'T'HH:mm:ss") : '';
+    const dataHoraFim = arg.event.end ? format(arg.event.end, "yyyy-MM-dd'T'HH:mm:ss") : '';
+
     const agendamentoRequest: iAgendamentoRequest = {
-      dataHoraInicio: arg.event.start?.toISOString() || '',
-      duracaoEmMinutos: Math.round((arg.event.end!.getTime() - arg.event.start!.getTime()) / 60000),
+      dataHoraInicio: dataHoraInicio,
+      duracaoEmMinutos: this.calculaDuracaoEmMinutos(dataHoraInicio, dataHoraFim),
       usuarioId: agendamento.usuario?.id || '',
       pacienteId: agendamento.paciente?.id || '',
       tipoAtendimentoId: agendamento.tipoAtendimento?.id || '',
@@ -272,6 +277,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   }
 
   abrirModalEdicao(arg: DateClickArg): void {
+    console.log(arg);
     this.dialogService.create({
       zTitle: 'Editar Agendamento',
       zDescription: `Preencha o formulário abaixo para editar o agendamento.`,
@@ -448,8 +454,9 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private calculaDuracaoEmMinutos(dataHoraInicio: string, dataHoraFim: string): number {
-    return Math.round(
-      (new Date(dataHoraFim).getTime() - new Date(dataHoraInicio).getTime()) / 60000,
-    );
+    const inicio = parseISO(dataHoraInicio);
+    const fim = parseISO(dataHoraFim);
+
+    return differenceInMinutes(fim, inicio);
   }
 }
