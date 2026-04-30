@@ -185,10 +185,6 @@ body {
   border-left: 4px solid var(--destructive) !important;
 }
 
-.fc-event.status-em_andamento {
-  border-left: 4px solid var(--chart-5) !important;
-}
-
 .fc-event.status-concluido {
   border-left: 4px solid var(--secondary-foreground) !important;
 }

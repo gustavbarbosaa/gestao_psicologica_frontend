@@ -1,0 +1,77 @@
+.flow-action {
+  min-height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.flow-action:active {
+  transform: scale(0.98);
+}
+
+.flow-action-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.flow-action-primary:hover {
+  background: color-mix(in oklch, var(--primary), black 8%);
+}
+
+.flow-action-success {
+  background: oklch(0.94 0.05 160);
+  border-color: oklch(0.86 0.08 160);
+  color: oklch(0.36 0.12 160);
+}
+
+.flow-action-success:hover {
+  background: oklch(0.90 0.07 160);
+}
+
+.flow-action-warning {
+  background: oklch(0.94 0.08 80);
+  border-color: oklch(0.86 0.10 80);
+  color: oklch(0.42 0.12 70);
+}
+
+.flow-action-warning:hover {
+  background: oklch(0.90 0.10 80);
+}
+
+.flow-action-blue {
+  background: oklch(0.94 0.05 240);
+  border-color: oklch(0.86 0.08 240);
+  color: oklch(0.42 0.13 240);
+}
+
+.flow-action-blue:hover {
+  background: oklch(0.90 0.07 240);
+}
+
+.flow-action-danger {
+  background: oklch(0.96 0.04 25);
+  border-color: oklch(0.90 0.07 25);
+  color: var(--destructive);
+}
+
+.flow-action-danger:hover {
+  background: oklch(0.93 0.06 25);
+}
+
+.flow-action-neutral {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--muted-foreground);
+}
+
+.flow-action-neutral:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}

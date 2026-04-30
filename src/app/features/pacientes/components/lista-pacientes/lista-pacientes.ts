@@ -39,6 +39,20 @@ export class ListaPacientes implements OnInit {
   }
 
   removerPaciente(pacienteId: string): void {
+    this.dialog.create({
+      zContent: 'Tem certeza que deseja remover este paciente?',
+      zTitle: 'Confirmação',
+      zViewContainerRef: this.vcr,
+      zOkText: 'Remover',
+      zCancelText: 'Cancelar',
+      zOkDestructive: true,
+      zOnOk: () => {
+        this.confirmaRemoverPaciente(pacienteId);
+      },
+    });
+  }
+
+  private confirmaRemoverPaciente(pacienteId: string): void {
     this.pacienteService.deletarPaciente(pacienteId).subscribe({
       next: () => {
         this.toastService.exibirToastSucesso('Sucesso', 'Paciente removido com sucesso.');

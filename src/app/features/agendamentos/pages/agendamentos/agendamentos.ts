@@ -16,13 +16,19 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import ptBrLocale from '@fullcalendar/core/locales/pt-br';
 import { ZardDialogService } from '@shared/components/dialog/dialog.service';
 import { CriaAgendamentoForm } from '@features/agendamentos/components/cria-agendamento-form/cria-agendamento-form';
-import { iAgendamentoRequest } from '@shared/models/agendamento.model';
+import {
+  iAgendamentoRequest,
+  iAgendamentoResponse,
+  StatusAtendimento,
+  StatusPagamento,
+} from '@shared/models/agendamento.model';
 import { AgendamentoService } from '@core/services/agendamento-service';
 import { ToastService } from '@shared/services/toast-service';
-import { Subject, takeUntil } from 'rxjs';
+import { catchError, Observable, Subject, takeUntil, tap, throwError } from 'rxjs';
 import { TipoAtendimentoService } from '@core/services/tipo-atendimento';
 import { EditarAgendamentoForm } from '@features/agendamentos/components/editar-agendamento/editar-agendamento-form';
 import { format, differenceInMinutes, parseISO } from 'date-fns';
+import { PagamentoService } from '@core/services/pagamento-service';
 
 @Component({
   selector: 'app-agendamentos',
@@ -33,6 +39,7 @@ import { format, differenceInMinutes, parseISO } from 'date-fns';
 export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   private readonly dialogService = inject(ZardDialogService);
   private readonly agendamentoService = inject(AgendamentoService);
+  private readonly pagamentoService = inject(PagamentoService);
   private readonly toastService = inject(ToastService);
   private readonly tipoAtendimentoService = inject(TipoAtendimentoService);
   private readonly DURACAO_PADRAO_EM_MINUTOS = 60;
@@ -47,6 +54,20 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
     { label: 'Confirmado', status: 'CONFIRMADO' },
     { label: 'Cobrança Gerada', status: 'COBRANCA_GERADA' },
     { label: 'Outros', status: 'DEFAULT' },
+  ];
+
+  legendasAtendimento: { label: string; status: StatusAtendimento }[] = [
+    { label: 'Criado', status: 'CRIADO' },
+    { label: 'Confirmado', status: 'CONFIRMADO' },
+    { label: 'Concluído', status: 'CONCLUIDO' },
+    { label: 'Cancelado', status: 'CANCELADO' },
+    { label: 'Não compareceu', status: 'NAO_COMPARECEU' },
+  ];
+
+  legendasPagamento: { label: string; status: StatusPagamento }[] = [
+    { label: 'Pendente', status: 'PENDENTE' },
+    { label: 'Pago', status: 'CONFIRMADO' },
+    { label: 'Cobrança gerada', status: 'COBRANCA_GERADA' },
   ];
 
   @ViewChild('calendar') calendarComponent!: FullCalendarComponent;
@@ -88,7 +109,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
         return ['status-' + status.toLowerCase()];
       },
-      eventContent: (arg) => this.criaCardEventAgenddamento(arg),
+      eventContent: (arg) => this.criaCardEventoAgendamento(arg),
       eventClick: (arg: EventClickArg) => this.handleEventClick(arg),
       headerToolbar: {
         left: 'prev,next today',
@@ -150,7 +171,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
           title: agendamento.paciente.nome,
           start: agendamento.dataHoraInicio,
           end: agendamento.dataHoraFim,
-          color: this.getCorAgendamentoPorStatus(agendamento.statusPagamento),
+          color: this.getCorAtendimentoPorStatus(agendamento.statusAtendimento),
           extendedProps: { agendamento },
         }));
 
@@ -170,7 +191,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       title: agendamento.paciente.nome,
       start: agendamento.dataHoraInicio,
       end: agendamento.dataHoraFim,
-      color: this.getCorAgendamentoPorStatus(agendamento.statusPagamento),
+      color: this.getCorAtendimentoPorStatus(agendamento.statusAtendimento),
       extendedProps: { agendamento },
     };
 
@@ -187,7 +208,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       title: agendamento.paciente.nome,
       start: agendamento.dataHoraInicio,
       end: agendamento.dataHoraFim,
-      color: this.getCorAgendamentoPorStatus(agendamento.statusPagamento),
+      color: this.getCorAtendimentoPorStatus(agendamento.statusAtendimento),
       statusPagamento: agendamento.statusPagamento,
       extendedProps: { agendamento },
     };
@@ -241,7 +262,6 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   }
 
   abrirModalEdicao(arg: DateClickArg): void {
-    console.log(arg);
     this.dialogService.create({
       zTitle: 'Editar Agendamento',
       zDescription: `Preencha o formulário abaixo para editar o agendamento.`,
@@ -315,6 +335,16 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         pacienteId: agendamento.paciente?.id || '',
         usuarioId: agendamento.usuario?.id || '',
         tipoAtendimentoId: agendamento.tipoAtendimento?.id || '',
+        agendamento,
+        onChangeStatusAtendimento: (status: StatusAtendimento) => {
+          return this.alterarStatusAtendimento(agendamento.id, status);
+        },
+        onConfirmarPagamento: () => {
+          this.alterarStatusPagamento(agendamento.id, 'CONFIRMADO');
+        },
+        onGerarCobranca: () => {
+          return this.gerarCobrancaPagamento(agendamento.id);
+        },
       },
       zOkIcon: 'check',
       zCancelIcon: 'x',
@@ -341,7 +371,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
                   title: ag.paciente.nome,
                   start: ag.dataHoraInicio,
                   end: ag.dataHoraFim,
-                  color: this.getCorAgendamentoPorStatus(ag.statusPagamento),
+                  color: this.getCorAtendimentoPorStatus(ag.statusAtendimento),
                   extendedProps: { agendamento: ag },
                 };
 
@@ -395,26 +425,128 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         );
       },
       error: (err) => {
-        this.toastService.exibirToastErro(
-          'Erro ao criar agendamento',
-          'Tente novamente mais tarde.',
-        );
+        this.toastService.exibirToastErro('Erro ao criar agendamento', err.error.erros[0]);
         console.error('Erro ao criar agendamento', err);
       },
     });
   }
 
-  getCorAgendamentoPorStatus(statusPagamento: string): string {
+  private alterarStatusAtendimento(
+    agendamentoId: string,
+    status: StatusAtendimento,
+  ): Observable<iAgendamentoResponse> {
+    return this.agendamentoService.alterarStatusAtendimento(agendamentoId, status).pipe(
+      tap((agendamento) => {
+        this.toastService.exibirToastSucesso(
+          'Status atualizado',
+          `Atendimento marcado como ${this.getLabelStatus(status)}.`,
+        );
+        this.atualizarEventoNoCalendario(agendamento);
+      }),
+      catchError((err) => {
+        const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Tente novamente.';
+        this.toastService.exibirToastErro('Erro ao atualizar status', mensagem);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  private alterarStatusPagamento(agendamentoId: string, status: StatusPagamento): void {
+    this.pagamentoService.alterarStatusPagamento(agendamentoId, status).subscribe({
+      next: (agendamento) => {
+        this.toastService.exibirToastSucesso(
+          'Pagamento atualizado',
+          `Pagamento marcado como ${this.getLabelStatus(status)}.`,
+        );
+        this.atualizarEventoNoCalendario(agendamento);
+      },
+      error: (err) => {
+        const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Tente novamente.';
+        this.toastService.exibirToastErro('Erro ao atualizar pagamento', mensagem);
+      },
+    });
+  }
+
+  private gerarCobrancaPagamento(agendamentoId: string): Observable<iAgendamentoResponse> {
+    return this.pagamentoService.alterarStatusPagamento(agendamentoId, 'COBRANCA_GERADA').pipe(
+      tap((agendamento) => {
+        this.toastService.exibirToastSucesso(
+          'Pagamento atualizado',
+          `Pagamento marcado como ${this.getLabelStatus('COBRANCA_GERADA')}.`,
+        );
+        this.atualizarEventoNoCalendario(agendamento);
+      }),
+      catchError((err) => {
+        const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Tente novamente.';
+        this.toastService.exibirToastErro('Erro ao atualizar pagamento', mensagem);
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  private atualizarEventoNoCalendario(agendamento: iAgendamentoResponse): void {
+    const api = this.calendarComponent.getApi();
+    const existing = api.getEventById(agendamento.id);
+
+    if (existing) {
+      existing.remove();
+    }
+
+    api.addEvent({
+      id: agendamento.id,
+      title: agendamento.paciente.nome,
+      start: agendamento.dataHoraInicio,
+      end: agendamento.dataHoraFim,
+      color: this.getCorAtendimentoPorStatus(agendamento.statusAtendimento),
+      extendedProps: { agendamento },
+    });
+  }
+
+  getCorAtendimentoPorStatus(statusAtendimento: string): string {
+    switch (statusAtendimento) {
+      case 'CRIADO':
+        return '#64748B';
+      case 'CONFIRMADO':
+        return '#0F766E';
+      case 'CONCLUIDO':
+        return '#059669';
+      case 'CANCELADO':
+        return '#DC2626';
+      case 'REAGENDADO':
+        return '#2563EB';
+      case 'NAO_COMPARECEU':
+        return '#71717A';
+      default:
+        return '#94A3B8';
+    }
+  }
+
+  getCorPagamentoPorStatus(statusPagamento: string): string {
     switch (statusPagamento) {
       case 'PENDENTE':
-        return '#FFA500';
+        return '#D97706';
       case 'CONFIRMADO':
-        return '#4CAF50';
+        return '#059669';
       case 'COBRANCA_GERADA':
-        return '#0288D1';
+        return '#2563EB';
       default:
-        return '#9E9E9E';
+        return '#94A3B8';
     }
+  }
+
+  getLabelStatus(status: string): string {
+    const labels: Record<string, string> = {
+      CRIADO: 'criado',
+      CONFIRMADO: 'confirmado',
+      CANCELADO: 'cancelado',
+      CONCLUIDO: 'concluído',
+      REAGENDADO: 'reagendado',
+      NAO_COMPARECEU: 'não compareceu',
+      PENDENTE: 'pendente',
+      COBRANCA_GERADA: 'cobrança gerada',
+    };
+
+    return labels[status] ?? status.toLowerCase();
   }
 
   private calculaDuracaoEmMinutos(dataHoraInicio: string, dataHoraFim: string): number {
@@ -424,104 +556,44 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
     return differenceInMinutes(fim, inicio);
   }
 
-  private criaCardEventAgenddamento(arg: EventContentArg) {
+  private criaCardEventoAgendamento(arg: EventContentArg) {
     const agendamento = arg.event.extendedProps['agendamento'];
+    const corAtendimento = this.getCorAtendimentoPorStatus(agendamento.statusAtendimento);
+    const deveMostrarPagamento = agendamento.statusAtendimento !== 'CANCELADO';
 
-    let iconPagamento = '';
-    let iconTipo = '';
-    let statusBorderClass = '';
+    const iconPagamento =
+      agendamento.statusPagamento === 'CONFIRMADO'
+        ? 'fa-check'
+        : agendamento.statusPagamento === 'COBRANCA_GERADA'
+          ? 'fa-dollar-sign'
+          : 'fa-clock';
 
-    switch (agendamento.statusPagamento) {
-      case 'PENDENTE':
-        iconPagamento = 'fa-clock';
-        break;
-      case 'CONFIRMADO':
-        iconPagamento = 'fa-check';
-        break;
-      case 'COBRANCA_GERADA':
-        iconPagamento = 'fa-dollar-sign';
-        break;
-    }
-
-    switch (agendamento.tipoAtendimento?.nome) {
-      case 'PRESENCIAL':
-        iconTipo = 'fa-building';
-        break;
-      case 'ONLINE':
-        iconTipo = 'fa-video';
-        break;
-    }
-
-    switch (agendamento.statusAtendimento) {
-      case 'CONFIRMADO':
-        statusBorderClass = 'border-primary';
-        break;
-
-      case 'CANCELADO':
-        statusBorderClass = 'border-destructive';
-        break;
-
-      case 'EM_ANDAMENTO':
-        statusBorderClass = 'border-chart-5';
-        break;
-
-      case 'CONCLUIDO':
-        statusBorderClass = 'border-secondary-foreground';
-        break;
-
-      case 'REAGENDADO':
-        statusBorderClass = 'border-chart-3';
-        break;
-
-      default:
-        statusBorderClass = 'border-muted-foreground';
-    }
+    const iconTipo = agendamento.tipoAtendimento?.nome === 'ONLINE' ? 'fa-video' : 'fa-building';
 
     return {
       html: `
-    <div class="
-      h-full
-      flex flex-col
-      px-2 py-1
-      bg-card
-      text-card-foreground
-      border border-border
-      border-l-4 ${statusBorderClass}
-      rounded-lg
-      shadow-sm
-      hover:bg-accent
-      hover:shadow-md
-      transition-all
-      overflow-hidden
-    ">
+        <div class="gp-calendar-event" style="border-left-color: ${corAtendimento}">
+          <div class="gp-event-header">
+            <i class="fas ${iconTipo} gp-event-icon"></i>
+            <span class="gp-event-title">${arg.event.title}</span>
+            ${deveMostrarPagamento ? `<i class="fas ${iconPagamento} gp-event-icon ml-auto"></i>` : ''}
+          </div>
 
-      <div class="flex items-start gap-1.5 min-w-0">
+          <div class="gp-event-meta">
+            <span>${arg.timeText}</span>
+            <span>•</span>
+            <span>${this.getLabelStatus(agendamento.statusAtendimento)}</span>
+          </div>
 
-        <i class="fas ${iconTipo} text-xs text-muted-foreground shrink-0 mt-0.5"></i>
-
-        <span class="text-sm font-medium truncate">
-          ${arg.event.title}
-        </span>
-
-        <i class="fas ${iconPagamento} text-xs text-muted-foreground/70 shrink-0 ml-auto mt-0.5"></i>
-
-      </div>
-
-      <div class="
-        flex items-center gap-1
-        text-xs text-muted-foreground
-        mt-0.5
-        truncate
-      ">
-        <span class="whitespace-nowrap">${arg.timeText}</span>
-        <span>•</span>
-        <span class="font-medium truncate">
-          ${agendamento.statusAtendimento}
-        </span>
-      </div>
-
-    </div>
-  `,
+          ${
+            deveMostrarPagamento
+              ? `<div class="gp-event-meta">
+                  <span class="gp-event-payment">Pagamento: ${this.getLabelStatus(agendamento.statusPagamento)}</span>
+                </div>`
+              : ''
+          }
+        </div>
+      `,
     };
   }
 }

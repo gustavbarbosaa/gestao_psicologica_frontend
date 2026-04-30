@@ -25,7 +25,7 @@ export class MenuPrincipal implements OnInit {
       {
         icone: 'layout-dashboard',
         titulo: 'Dashboard',
-        url: '#',
+        url: '/home',
       },
       {
         icone: 'calendar',
@@ -45,7 +45,7 @@ export class MenuPrincipal implements OnInit {
       {
         icone: 'circle-dollar-sign',
         titulo: 'Financeiro',
-        url: '#',
+        url: '/financeiro',
       },
     ];
   }

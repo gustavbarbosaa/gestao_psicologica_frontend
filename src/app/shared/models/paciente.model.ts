@@ -1,7 +1,6 @@
 export interface iPacienteMinResponse {
   id: string;
   nome: string;
-  valorSessaoPadrao: number;
   ativo: boolean;
 }
 

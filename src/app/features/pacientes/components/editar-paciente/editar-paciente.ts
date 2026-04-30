@@ -6,7 +6,6 @@ import { Z_MODAL_DATA } from '@shared/components/dialog/dialog.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { iPacienteRequest } from '@shared/models/paciente.model';
 import { ZardIconComponent } from '@shared/components/icon';
-import { ZardInputGroupComponent } from '@shared/components/input-group';
 import { CommonModule } from '@angular/common';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
@@ -22,7 +21,6 @@ interface IModalData {
     CommonModule,
     ReactiveFormsModule,
     ZardIconComponent,
-    ZardInputGroupComponent,
     NgxMaskDirective,
   ],
   templateUrl: './editar-paciente.html',

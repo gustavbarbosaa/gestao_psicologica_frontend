@@ -1,0 +1,71 @@
+.dashboard-card {
+  border: 1px solid rgb(226 232 240);
+  border-radius: 0.75rem;
+  background: white;
+  padding: 1rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+.metric-label {
+  color: rgb(100 116 139);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.metric-value {
+  display: block;
+  margin-top: 0.25rem;
+  color: rgb(30 41 59);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.metric-help {
+  display: block;
+  margin-top: 0.25rem;
+  color: rgb(148 163 184);
+  font-size: 0.75rem;
+}
+
+.metric-icon {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-radius: 999px;
+}
+
+.status-success {
+  background: rgb(220 252 231);
+  color: rgb(21 128 61) !important;
+  border-color: rgb(187 247 208) !important;
+}
+
+.status-warning {
+  background: rgb(254 243 199);
+  color: rgb(180 83 9) !important;
+  border-color: rgb(253 230 138) !important;
+}
+
+.status-info {
+  background: rgb(219 234 254);
+  color: rgb(29 78 216) !important;
+  border-color: rgb(191 219 254) !important;
+}
+
+.status-danger {
+  background: rgb(254 226 226);
+  color: rgb(185 28 28) !important;
+  border-color: rgb(254 202 202) !important;
+}
+
+.status-muted,
+.status-neutral {
+  background: var(--muted);
+  color: var(--muted-foreground) !important;
+  border-color: var(--border) !important;
+}

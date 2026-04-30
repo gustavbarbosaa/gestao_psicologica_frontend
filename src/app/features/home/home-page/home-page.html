@@ -1,1 +1,272 @@
-<p>Olá, estou na home</p>
+<div class="space-y-6 animate-in fade-in duration-500">
+  <section class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Dashboard</h1>
+      <p class="text-slate-500 text-sm mt-1">Visao geral da agenda e dos recebimentos do mes.</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <button
+        type="button"
+        z-button
+        zType="outline"
+        (click)="carregarAgendamentos()"
+        [zLoading]="loading()"
+      >
+        <div class="flex items-center gap-2">
+          <z-icon zType="clock" class="w-4 h-4" />
+          <span>Atualizar</span>
+        </div>
+      </button>
+
+      <a
+        z-button
+        routerLink="/agendamentos"
+        class="bg-teal-700 hover:bg-teal-800 text-white shadow-sm shadow-teal-900/10 transition-all active:scale-95"
+      >
+        <div class="flex items-center gap-2">
+          <z-icon zType="calendar-plus" class="w-4 h-4" />
+          <span>Novo agendamento</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+    <article class="dashboard-card">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="metric-label">Hoje</p>
+          <strong class="metric-value">{{ resumo().atendimentosHoje }}</strong>
+          <span class="metric-help">{{ resumo().confirmadosHoje }} confirmados</span>
+        </div>
+        <div class="metric-icon bg-teal-50 text-teal-700 border-teal-100">
+          <z-icon zType="calendar" class="w-5 h-5" />
+        </div>
+      </div>
+    </article>
+
+    <article class="dashboard-card">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="metric-label">Recebido</p>
+          <strong class="metric-value">{{ formatarMoeda(resumo().receitaConfirmadaMes) }}</strong>
+          <span class="metric-help">{{ resumo().concluidosMes }} concluidos no mês</span>
+        </div>
+        <div class="metric-icon bg-emerald-50 text-emerald-700 border-emerald-100">
+          <z-icon zType="circle-check" class="w-5 h-5" />
+        </div>
+      </div>
+    </article>
+
+    <article class="dashboard-card">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="metric-label">Em aberto</p>
+          <strong class="metric-value">{{ formatarMoeda(resumo().receitaPendenteMes) }}</strong>
+          <span class="metric-help">{{ resumo().pagamentosPendentes }} pagamentos pendentes</span>
+        </div>
+        <div class="metric-icon bg-amber-50 text-amber-700 border-amber-100">
+          <z-icon zType="clock" class="w-5 h-5" />
+        </div>
+      </div>
+    </article>
+
+    <article class="dashboard-card">
+      <div class="flex items-start justify-between gap-3">
+        <div>
+          <p class="metric-label">Agenda do mês</p>
+          <strong class="metric-value">{{ agendamentosMes().length }}</strong>
+          <span class="metric-help">Atendimentos registrados</span>
+        </div>
+        <div class="metric-icon bg-blue-50 text-blue-700 border-blue-100">
+          <z-icon zType="users" class="w-5 h-5" />
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="grid grid-cols-1 xl:grid-cols-[1.25fr_0.75fr] gap-4">
+    <article class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div
+        class="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between gap-4"
+      >
+        <div>
+          <h2 class="text-sm font-bold text-slate-800">Agenda de hoje</h2>
+          <p class="text-sm text-slate-500 mt-1">Proximos atendimentos do dia.</p>
+        </div>
+        <a
+          class="text-sm font-semibold text-teal-700 hover:text-teal-800"
+          routerLink="/agendamentos"
+        >
+          Ver agenda
+        </a>
+      </div>
+
+      @if (loading()) {
+        <div class="px-6 py-16 text-center text-slate-500 font-medium">Carregando agenda...</div>
+      } @else if (proximosAtendimentos().length === 0) {
+        <div class="px-6 py-16 text-center">
+          <div class="flex flex-col items-center justify-center gap-3">
+            <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+              <z-icon zType="calendar" class="w-6 h-6 text-slate-300" />
+            </div>
+            <p class="text-slate-500 font-medium">Nenhum atendimento restante para hoje.</p>
+          </div>
+        </div>
+      } @else {
+        <div class="divide-y divide-slate-100">
+          @for (agendamento of proximosAtendimentos(); track agendamento.id) {
+            <div
+              class="px-6 py-4 grid grid-cols-[auto_1fr_auto] items-center gap-4 hover:bg-slate-50/80 transition-colors group"
+            >
+              <div class="text-center">
+                <div
+                  class="min-w-16 rounded-lg border border-teal-100 bg-teal-50 px-3 py-2 text-teal-700"
+                >
+                  <span class="block text-sm font-bold leading-none">
+                    {{ formatarHora(agendamento.dataHoraInicio) }}
+                  </span>
+                  <span class="mt-1 block text-[0.65rem] font-semibold uppercase">horario</span>
+                </div>
+              </div>
+
+              <div class="min-w-0 flex items-center gap-3">
+                <div
+                  class="w-10 h-10 rounded-full bg-slate-50 text-slate-700 border border-slate-100 flex items-center justify-center font-bold text-sm"
+                >
+                  {{ getIniciais(agendamento.paciente.nome) }}
+                </div>
+                <div class="min-w-0">
+                  <p
+                    class="font-semibold text-slate-700 truncate group-hover:text-teal-700 transition-colors"
+                  >
+                    {{ agendamento.paciente.nome }}
+                  </p>
+                  <p class="text-sm text-slate-500 truncate">
+                    {{ agendamento.tipoAtendimento.nome }} -
+                    {{ formatarMoeda(valorAgendamento(agendamento)) }}
+                  </p>
+                </div>
+              </div>
+
+              <span
+                class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                [ngClass]="getClasseStatus(agendamento.statusAtendimento)"
+              >
+                {{ getLabelStatus(agendamento.statusAtendimento) }}
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </article>
+
+    <div class="grid gap-4">
+      <article class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100">
+          <h2 class="text-sm font-bold text-slate-800">Resumo financeiro</h2>
+          <p class="text-sm text-slate-500 mt-1">Recebimento sobre o total previsto.</p>
+        </div>
+
+        <div class="p-6 space-y-5">
+          <div class="flex items-end justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium text-slate-500">Total previsto</p>
+              <strong class="block text-2xl font-bold text-slate-800 mt-1">
+                {{ formatarMoeda(resumo().receitaTotalMes) }}
+              </strong>
+            </div>
+            <span class="text-sm font-bold text-teal-700">{{ percentualRecebidoMes() }}%</span>
+          </div>
+
+          <div class="h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div
+              class="h-full rounded-full bg-teal-600 transition-all"
+              [style.width.%]="percentualRecebidoMes()"
+            ></div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-lg border border-emerald-100 bg-emerald-50 p-3">
+              <p class="text-xs font-semibold text-emerald-700">Recebido</p>
+              <strong class="mt-1 block text-sm font-bold text-emerald-800">
+                {{ formatarMoeda(resumo().receitaConfirmadaMes) }}
+              </strong>
+            </div>
+            <div class="rounded-lg border border-amber-100 bg-amber-50 p-3">
+              <p class="text-xs font-semibold text-amber-700">Em aberto</p>
+              <strong class="mt-1 block text-sm font-bold text-amber-800">
+                {{ formatarMoeda(resumo().receitaPendenteMes) }}
+              </strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div
+          class="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between gap-4"
+        >
+          <div>
+            <h2 class="text-sm font-bold text-slate-800">Pendências</h2>
+            <p class="text-sm text-slate-500 mt-1">Pagamentos em aberto.</p>
+          </div>
+          <a
+            class="text-sm font-semibold text-teal-700 hover:text-teal-800"
+            routerLink="/financeiro"
+          >
+            Financeiro
+          </a>
+        </div>
+
+        @if (loading()) {
+          <div class="px-6 py-10 text-center text-slate-500 font-medium">
+            Carregando pendências...
+          </div>
+        } @else if (pendencias().length === 0) {
+          <div class="px-6 py-10 text-center">
+            <div class="flex flex-col items-center justify-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+                <z-icon zType="circle-dollar-sign" class="w-6 h-6 text-slate-300" />
+              </div>
+              <p class="text-slate-500 font-medium">Nenhuma pendência financeira no mês.</p>
+            </div>
+          </div>
+        } @else {
+          <div class="divide-y divide-slate-100">
+            @for (agendamento of pendencias(); track agendamento.id) {
+              <div class="px-6 py-4 flex items-center gap-3 hover:bg-slate-50/80 transition-colors">
+                <div
+                  class="w-10 h-10 rounded-full bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center"
+                >
+                  <z-icon zType="circle-dollar-sign" class="w-5 h-5" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-semibold text-slate-700 truncate">
+                    {{ agendamento.paciente.nome }}
+                  </p>
+                  <p class="text-sm text-slate-500 truncate">
+                    {{ formatarDataHora(agendamento.dataHoraInicio) }} -
+                    {{ agendamento.tipoAtendimento.nome }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold text-slate-700">
+                    {{ formatarMoeda(valorAgendamento(agendamento)) }}
+                  </p>
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                    [ngClass]="getClasseStatus(agendamento.statusPagamento)"
+                  >
+                    {{ getLabelStatus(agendamento.statusPagamento) }}
+                  </span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </article>
+    </div>
+  </section>
+</div>

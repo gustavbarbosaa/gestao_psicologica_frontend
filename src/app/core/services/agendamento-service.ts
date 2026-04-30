@@ -1,7 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
-import { iAgendamentoRequest, iAgendamentoResponse } from '@shared/models/agendamento.model';
+import {
+  iAgendamentoRequest,
+  iAgendamentoResponse,
+  StatusAtendimento,
+  StatusPagamento,
+} from '@shared/models/agendamento.model';
 import { Observable, Subject, tap } from 'rxjs';
 
 @Injectable({
@@ -57,6 +62,16 @@ export class AgendamentoService {
   public deletarAgendamento(agendamentoId: string): Observable<iAgendamentoResponse> {
     return this.httpClient.delete<iAgendamentoResponse>(
       `${this.API_URL}${this.AGENDAMENTOS_PATH}/${agendamentoId}`,
+    );
+  }
+
+  public alterarStatusAtendimento(
+    agendamentoId: string,
+    statusAtendimento: StatusAtendimento,
+  ): Observable<iAgendamentoResponse> {
+    return this.httpClient.patch<iAgendamentoResponse>(
+      `${this.API_URL}${this.AGENDAMENTOS_PATH}/${agendamentoId}/status`,
+      { statusAtendimento },
     );
   }
 }

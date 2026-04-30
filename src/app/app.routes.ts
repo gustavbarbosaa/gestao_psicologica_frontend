@@ -39,6 +39,12 @@ export const routes: Routes = [
     canMatch: [authGuard],
   },
   {
+    path: 'financeiro',
+    loadComponent: () =>
+      import('./features/financeiro/pages/financeiro/financeiro').then((m) => m.Financeiro),
+    canMatch: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },

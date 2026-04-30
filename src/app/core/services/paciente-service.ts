@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@env/environment';
 import {
@@ -30,9 +31,12 @@ export class PacienteService {
     );
   }
 
-  public buscarPacientesPorUsuario(): Observable<iPacienteMaxResponse[]> {
+  public buscarPacientesPorUsuario(termo?: string): Observable<iPacienteMaxResponse[]> {
+    const params = termo?.trim() ? new HttpParams().set('termo', termo.trim()) : undefined;
+
     return this.httpClient.get<iPacienteMaxResponse[]>(
       `${this.API_URL}${this.PACIENTES_POR_USUARIO_PATH}`,
+      { params },
     );
   }
 

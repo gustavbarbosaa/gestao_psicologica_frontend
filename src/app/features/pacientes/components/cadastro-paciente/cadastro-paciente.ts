@@ -8,7 +8,6 @@ import { ToastService } from '@shared/services/toast-service';
 import { iPacienteRequest } from '@shared/models/paciente.model';
 import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 import { ZardIconComponent } from '@shared/components/icon';
-import { ZardInputGroupComponent } from '@shared/components/input-group';
 
 interface IModalData {
   pacienteId?: string;
@@ -23,7 +22,6 @@ interface IModalData {
     ReactiveFormsModule,
     NgxMaskDirective,
     ZardIconComponent,
-    ZardInputGroupComponent,
   ],
   templateUrl: './cadastro-paciente.html',
   styleUrl: './cadastro-paciente.css',

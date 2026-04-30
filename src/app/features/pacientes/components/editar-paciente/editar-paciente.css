@@ -1,0 +1,43 @@
+.patient-action {
+  min-height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+.patient-action:active {
+  transform: scale(0.98);
+}
+
+.patient-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.patient-action-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.patient-action-primary:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--primary), black 8%);
+}
+
+.patient-action-neutral {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--muted-foreground);
+}
+
+.patient-action-neutral:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}

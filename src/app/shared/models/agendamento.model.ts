@@ -3,12 +3,23 @@ import { iLoginResponse } from './login.model';
 import { iPacienteMinResponse } from './paciente.model';
 import { iTipoAtendimento } from './tipo-atendimento.model';
 
+export type StatusAtendimento =
+  | 'CRIADO'
+  | 'CONFIRMADO'
+  | 'CANCELADO'
+  | 'CONCLUIDO'
+  | 'REAGENDADO'
+  | 'NAO_COMPARECEU';
+
+export type StatusPagamento = 'PENDENTE' | 'CONFIRMADO' | 'COBRANCA_GERADA';
+
 export interface iAgendamentoResponse {
   id: string;
-  statusPagamento: string;
+  statusPagamento: StatusPagamento;
   dataHoraInicio: string;
   dataHoraFim: string;
   paciente: iPacienteMinResponse;
+  statusAtendimento: StatusAtendimento;
   usuario: iLoginResponse;
   tipoAtendimento: iTipoAtendimento;
 }
