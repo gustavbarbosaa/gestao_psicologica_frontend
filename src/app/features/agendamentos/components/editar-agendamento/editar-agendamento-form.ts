@@ -68,6 +68,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   public buscaPaciente = signal<string>('');
   public pacienteDropdownAberto = signal<boolean>(false);
   public carregandoPacientes = signal<boolean>(false);
+  public horaAtual = signal<Date>(new Date());
   public pacienteSelecionado = computed(() => {
     const pacienteId = this.form.controls.pacienteId.value || this.agendamento()?.paciente.id;
 
@@ -78,6 +79,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   });
   private readonly buscaPaciente$ = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
+  private relogioNaoCompareceuId?: ReturnType<typeof setInterval>;
   public form = this.formBuilder.group<iAgendamentoRequestForm>({
     dataHoraInicio: this.formBuilder.control('', Validators.required),
     duracaoEmMinutos: this.formBuilder.control(60, [Validators.required, Validators.min(15)]),
@@ -88,11 +90,22 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.iniciarForm();
+    this.iniciarRelogioNaoCompareceu();
   }
 
   ngOnDestroy(): void {
+    if (this.relogioNaoCompareceuId) {
+      clearInterval(this.relogioNaoCompareceuId);
+    }
+
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private iniciarRelogioNaoCompareceu(): void {
+    this.relogioNaoCompareceuId = setInterval(() => {
+      this.horaAtual.set(new Date());
+    }, 60000);
   }
 
   private iniciarForm(): void {
@@ -196,7 +209,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   }
 
   fecharBuscaPaciente(): void {
-    window.setTimeout(() => this.pacienteDropdownAberto.set(false), 120);
+    globalThis.setTimeout(() => this.pacienteDropdownAberto.set(false), 120);
   }
 
   buscarPaciente(event: Event): void {
@@ -275,7 +288,13 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   }
 
   get podeMarcarNaoCompareceu(): boolean {
-    return this.statusAtendimento === 'CONFIRMADO';
+    const dataHoraInicio = this.getDataHoraInicioSelecionada();
+
+    return (
+      this.statusAtendimento === 'CONFIRMADO' &&
+      !!dataHoraInicio &&
+      this.horaAtual().getTime() > dataHoraInicio.getTime()
+    );
   }
 
   get podeReagendarAtendimento(): boolean {
@@ -514,9 +533,9 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     }
 
     const termoNormalizado = this.normalizarTexto(termo);
-    const termoNumerico = termo.replace(/\D/g, '');
+    const termoNumerico = termo.replaceAll(/\D/g, '');
     const nome = this.normalizarTexto(paciente.nome);
-    const telefone = paciente.telefone?.replace(/\D/g, '') ?? '';
+    const telefone = paciente.telefone?.replaceAll(/\D/g, '') ?? '';
 
     return (
       nome.includes(termoNormalizado) || Boolean(termoNumerico && telefone.includes(termoNumerico))
@@ -526,7 +545,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   private normalizarTexto(texto: string): string {
     return texto
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
+      .replaceAll(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .trim();
   }
