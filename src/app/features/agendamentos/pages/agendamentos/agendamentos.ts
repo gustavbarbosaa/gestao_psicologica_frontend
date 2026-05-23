@@ -9,7 +9,7 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { FullCalendarComponent, FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg, EventContentArg } from '@fullcalendar/core';
+import { CalendarOptions, EventClickArg, EventContentArg, EventDropArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { DateClickArg, EventResizeDoneArg } from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -130,7 +130,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
     };
   }
 
-  handleEventResizeOrDrop(arg: EventResizeDoneArg | EventClickArg): void {
+  handleEventResizeOrDrop(arg: EventResizeDoneArg | EventDropArg): void {
     const agendamento: any = (arg.event.extendedProps as any)?.agendamento;
 
     const dataHoraInicio = arg.event.start ? format(arg.event.start, "yyyy-MM-dd'T'HH:mm:ss") : '';
@@ -146,6 +146,12 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
     this.agendamentoService.editarAgendamento(arg.event.id, agendamentoRequest).subscribe({
       next: (response) => {
+        arg.event.setStart(response.dataHoraInicio);
+        arg.event.setEnd(response.dataHoraFim);
+        arg.event.setExtendedProp('agendamento', response);
+        arg.event.setProp('title', response.paciente.nome);
+        arg.event.setProp('color', this.getCorAtendimentoPorStatus(response.statusAtendimento));
+
         this.toastService.exibirToastSucesso(
           'Agendamento atualizado',
           `Agendamento para ${response.paciente.nome} atualizado.`,
@@ -158,6 +164,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
           'Erro',
           'Não foi possível atualizar o agendamento: ' + mensagem,
         );
+        arg.revert();
         console.error('Erro ao editar agendamento', err);
       },
     });
@@ -294,8 +301,18 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
   handleEventClick(arg: EventClickArg): void {
     const event = arg.event;
-
-    const agendamento = (event.extendedProps as any)?.agendamento;
+    const agendamentoOriginal = (event.extendedProps as any)?.agendamento;
+    const agendamento = agendamentoOriginal
+      ? {
+          ...agendamentoOriginal,
+          dataHoraInicio: event.start
+            ? format(event.start, "yyyy-MM-dd'T'HH:mm:ss")
+            : agendamentoOriginal.dataHoraInicio,
+          dataHoraFim: event.end
+            ? format(event.end, "yyyy-MM-dd'T'HH:mm:ss")
+            : agendamentoOriginal.dataHoraFim,
+        }
+      : null;
 
     if (!agendamento) {
       const agendamentoId = event.id;

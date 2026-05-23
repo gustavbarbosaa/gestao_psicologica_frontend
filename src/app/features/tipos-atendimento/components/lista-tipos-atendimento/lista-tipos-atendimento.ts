@@ -47,6 +47,12 @@ export class ListaTiposAtendimento implements OnInit {
       zContent: CriarTipoAtendimento,
       zViewContainerRef: this.vcr,
       zData: { onSaved: () => this.carregarTipos() },
+      zOnOk: (component) => {
+        component.criarTipoAtendimento();
+        return false;
+      },
+      zCancelText: 'Cancelar',
+      zOkText: 'Salvar',
       zTitle: 'Criar tipo de atendimento',
     });
   }
@@ -56,6 +62,12 @@ export class ListaTiposAtendimento implements OnInit {
       zContent: CriarTipoAtendimento,
       zViewContainerRef: this.vcr,
       zData: { id: tipo.id, onSaved: () => this.carregarTipos() },
+      zOnOk: (component) => {
+        component.criarTipoAtendimento();
+        return false;
+      },
+      zCancelText: 'Cancelar',
+      zOkText: 'Salvar',
       zTitle: 'Editar tipo de atendimento',
     });
   }
