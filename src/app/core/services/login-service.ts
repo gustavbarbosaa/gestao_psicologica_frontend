@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, Signal, signal } from '@angular/core';
 import { environment } from '@env/environment';
 import { iLoginRequest, iLoginResponse } from '@shared/models/login.model';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
+import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +13,7 @@ export class LoginService {
   private LOGIN_PATH: string = 'autenticacao/login';
   private LOGOUT_PATH: string = 'autenticacao/logout';
   private CADASTRO_PATH: string = 'autenticacao/cadastro';
+  private CSRF_PATH: string = 'autenticacao/csrf';
   private ME_PATH: string = 'autenticacao/me';
 
   protected readonly usuarioLogado = signal<boolean>(false);
@@ -20,6 +21,9 @@ export class LoginService {
 
   login(data: iLoginRequest): Observable<iLoginResponse> {
     return this.httpClient.post<iLoginResponse>(`${this.API_URL}/${this.LOGIN_PATH}`, data).pipe(
+      switchMap((response: iLoginResponse) =>
+        this.httpClient.get<void>(`${this.API_URL}/${this.CSRF_PATH}`).pipe(map(() => response)),
+      ),
       tap((response: iLoginResponse) => {
         this.usuarioLogado.set(true);
         this.usuario.set(response);

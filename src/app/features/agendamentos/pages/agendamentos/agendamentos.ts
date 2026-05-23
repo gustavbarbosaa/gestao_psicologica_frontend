@@ -442,7 +442,11 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         );
       },
       error: (err) => {
-        this.toastService.exibirToastErro('Erro ao criar agendamento', err.error.erros[0]);
+        const mensagem =
+          err.error?.erros?.[0] ??
+          err.error?.message ??
+          'Não foi possível criar o agendamento.';
+        this.toastService.exibirToastErro('Erro ao criar agendamento', mensagem);
         console.error('Erro ao criar agendamento', err);
       },
     });

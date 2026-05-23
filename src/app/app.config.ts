@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from '@core/interceptors/auth-interceptor';
 import { authErrorInterceptor } from '@core/interceptors/auth-error-interceptor';
+import { csrfInterceptor } from '@core/interceptors/csrf-interceptor';
 
 import { provideEnvironmentNgxMask } from 'ngx-mask';
 import { registerLocaleData } from '@angular/common';
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, authErrorInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, csrfInterceptor, authErrorInterceptor])),
     provideEnvironmentNgxMask(),
     { provide: LOCALE_ID, useValue: 'pt-BR' },
   ],
