@@ -57,6 +57,12 @@ export class HomePage implements OnInit {
     this.agendamentosMes().filter((agendamento) => this.geraReceitaPrevista(agendamento)),
   );
 
+  protected readonly cancelamentosMes = computed(() =>
+    this.agendamentosMes()
+      .filter((agendamento) => agendamento.statusAtendimento === 'CANCELADO')
+      .sort((a, b) => this.compararPorData(a, b)),
+  );
+
   protected readonly proximosAtendimentos = computed(() =>
     this.agendamentosHoje()
       .filter(
@@ -76,6 +82,8 @@ export class HomePage implements OnInit {
     const agendamentosHoje = this.agendamentosHoje();
     const agendamentosMes = this.agendamentosMes();
     const agendamentosFaturaveisMes = this.agendamentosFaturaveisMes();
+    const cancelamentosMes = this.cancelamentosMes();
+    const valorCanceladoMes = this.somarValores(cancelamentosMes);
 
     return {
       atendimentosHoje: agendamentosHoje.length,
@@ -91,6 +99,8 @@ export class HomePage implements OnInit {
       pagamentosPendentes: agendamentosMes.filter((item) => this.deveCobrar(item)).length,
       concluidosMes: agendamentosMes.filter((item) => item.statusAtendimento === 'CONCLUIDO')
         .length,
+      cancelamentosMes: cancelamentosMes.length,
+      valorCanceladoMes,
     };
   });
 
@@ -185,6 +195,16 @@ export class HomePage implements OnInit {
     }
 
     return Math.min(100, Math.round((this.resumo().receitaConfirmadaMes / total) * 100));
+  }
+
+  protected percentualCanceladoMes(): number {
+    const totalProjetado = this.resumo().receitaTotalMes + this.resumo().valorCanceladoMes;
+
+    if (!totalProjetado) {
+      return 0;
+    }
+
+    return Math.min(100, Math.round((this.resumo().valorCanceladoMes / totalProjetado) * 100));
   }
 
   private estaNoIntervalo(data: string, start: Date, end: Date): boolean {
