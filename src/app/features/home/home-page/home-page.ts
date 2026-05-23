@@ -53,6 +53,10 @@ export class HomePage implements OnInit {
     ),
   );
 
+  protected readonly agendamentosFaturaveisMes = computed(() =>
+    this.agendamentosMes().filter((agendamento) => this.geraReceitaPrevista(agendamento)),
+  );
+
   protected readonly proximosAtendimentos = computed(() =>
     this.agendamentosHoje()
       .filter(
@@ -71,14 +75,15 @@ export class HomePage implements OnInit {
   protected readonly resumo = computed(() => {
     const agendamentosHoje = this.agendamentosHoje();
     const agendamentosMes = this.agendamentosMes();
+    const agendamentosFaturaveisMes = this.agendamentosFaturaveisMes();
 
     return {
       atendimentosHoje: agendamentosHoje.length,
       confirmadosHoje: agendamentosHoje.filter((item) => item.statusAtendimento === 'CONFIRMADO')
         .length,
-      receitaTotalMes: this.somarValores(agendamentosMes),
+      receitaTotalMes: this.somarValores(agendamentosFaturaveisMes),
       receitaConfirmadaMes: this.somarValores(
-        agendamentosMes.filter((item) => item.statusPagamento === 'CONFIRMADO'),
+        agendamentosFaturaveisMes.filter((item) => item.statusPagamento === 'CONFIRMADO'),
       ),
       receitaPendenteMes: this.somarValores(
         agendamentosMes.filter((item) => this.deveCobrar(item)),
@@ -196,7 +201,11 @@ export class HomePage implements OnInit {
 
   private deveCobrar(agendamento: iAgendamentoResponse): boolean {
     return (
-      agendamento.statusAtendimento !== 'CANCELADO' && agendamento.statusPagamento !== 'CONFIRMADO'
+      this.geraReceitaPrevista(agendamento) && agendamento.statusPagamento !== 'CONFIRMADO'
     );
+  }
+
+  private geraReceitaPrevista(agendamento: iAgendamentoResponse): boolean {
+    return agendamento.statusAtendimento !== 'CANCELADO';
   }
 }
