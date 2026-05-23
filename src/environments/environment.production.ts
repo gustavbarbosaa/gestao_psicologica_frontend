@@ -1,4 +1,4 @@
 export const environment = {
-  apiUrl: '/api/v1',
+  apiUrl: 'https://backend-gestao-psicologica.onrender.com/api/v1',
   prod: true,
 };
