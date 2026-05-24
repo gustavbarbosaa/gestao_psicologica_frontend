@@ -1,18 +1,62 @@
-<z-layout class="h-full w-full overflow-hidden rounded-lg">
-  <z-sidebar class="relative flex h-full flex-col border-none drop-shadow-md" [zWidth]="260">
+<z-layout class="layout-shell">
+  <div
+    class="mobile-overlay"
+    [class.mobile-overlay-open]="menuMobileAberto()"
+    (click)="fecharMenuMobile()"
+  ></div>
+
+  <z-sidebar class="desktop-sidebar" [zWidth]="260">
     <div class="pb-12">
-      <app-logo [logoReduzida]="false" corSubtitulo="text-accent-foreground"/>
+      <app-logo [logoReduzida]="false" corSubtitulo="text-accent-foreground" />
     </div>
 
-    <app-menu-principal class="flex-1 overflow-auto pb-24" />
+    <app-menu-principal class="flex-1 overflow-auto pb-24 bg-white" />
 
     <div class="absolute bottom-0 left-0 w-full px-6 py-4">
       <app-avatar-info [nome]="usuario()!.nome" [email]="usuario()!.email" />
     </div>
   </z-sidebar>
 
-  <z-layout class="flex-1 h-full w-full">
-    <z-content class="h-full w-full min-h-[200px] p-6">
+  <aside class="mobile-sidebar" [class.mobile-sidebar-open]="menuMobileAberto()">
+    <div class="flex items-center justify-between gap-4 border-b border-slate-100 px-4 py-4">
+      <app-logo [logoReduzida]="false" corSubtitulo="text-accent-foreground" />
+      <button
+        type="button"
+        class="mobile-menu-button"
+        aria-label="Fechar menu"
+        (click)="fecharMenuMobile()"
+      >
+        <z-icon zType="x" class="h-5 w-5" />
+      </button>
+    </div>
+
+    <div class="flex min-h-0 flex-1 flex-col overflow-hidden bg-white">
+      <app-menu-principal class="flex-1 overflow-auto px-4 py-4" />
+
+      <div class="border-t border-slate-100 px-4 py-4">
+        <app-avatar-info [nome]="usuario()!.nome" [email]="usuario()!.email" />
+      </div>
+    </div>
+  </aside>
+
+  <z-layout class="flex-1 min-h-screen w-full">
+    <header class="mobile-header">
+      <button
+        type="button"
+        class="mobile-menu-button"
+        aria-label="Abrir menu"
+        (click)="abrirMenuMobile()"
+      >
+        <z-icon zType="panel-left" class="h-5 w-5" />
+      </button>
+
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-slate-800">PsiManager</p>
+        <p class="truncate text-xs text-slate-500">{{ usuario()?.nome }}</p>
+      </div>
+    </header>
+
+    <z-content class="layout-content">
       <ng-content></ng-content>
     </z-content>
   </z-layout>

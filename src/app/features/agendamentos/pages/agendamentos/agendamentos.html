@@ -1,35 +1,46 @@
-<div class="space-y-5">
-  <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-    <p class="text-sm text-slate-500">Clique em uma data para criar um novo agendamento.</p>
-
-    <div class="flex flex-col gap-2 lg:flex-row lg:items-center">
-      <div class="legend-group">
-        <span class="legend-title">Atendimento</span>
-        @for (item of legendasAtendimento; track item.status) {
-          <div class="legend-item">
-            <span
-              class="legend-dot"
-              [style.backgroundColor]="getCorAtendimentoPorStatus(item.status)"
-            ></span>
-            <span>{{ item.label }}</span>
-          </div>
-        }
-      </div>
-
-      <div class="legend-group">
-        <span class="legend-title">Pagamento</span>
-        @for (item of legendasPagamento; track item.status) {
-          <div class="legend-item">
-            <span
-              class="legend-dot"
-              [style.backgroundColor]="getCorPagamentoPorStatus(item.status)"
-            ></span>
-            <span>{{ item.label }}</span>
-          </div>
-        }
-      </div>
+<div class="space-y-4">
+  <div class="schedule-header">
+    <div class="space-y-1">
+      <h1 class="text-xl font-bold text-slate-800 sm:text-2xl">Agenda</h1>
+      <p class="text-sm text-slate-500">Clique em um horário para criar ou arraste para reorganizar.</p>
     </div>
+
+    <section class="legend-panel" aria-label="Legenda de status">
+      <div class="legend-column">
+        <span class="legend-heading">Atendimento</span>
+        <div class="legend-list">
+          @for (item of legendasAtendimento; track item.status) {
+            <div class="legend-item">
+              <span
+                class="legend-dot"
+                [style.backgroundColor]="getCorAtendimentoPorStatus(item.status)"
+              ></span>
+              <span>{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="legend-divider"></div>
+
+      <div class="legend-column">
+        <span class="legend-heading">Pagamento</span>
+        <div class="legend-list">
+          @for (item of legendasPagamento; track item.status) {
+            <div class="legend-item">
+              <span
+                class="legend-dot"
+                [style.backgroundColor]="getCorPagamentoPorStatus(item.status)"
+              ></span>
+              <span>{{ item.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
   </div>
 
-  <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+  <div class="calendar-surface">
+    <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+  </div>
 </div>

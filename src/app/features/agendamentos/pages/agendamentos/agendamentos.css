@@ -1,40 +1,53 @@
-.legend-group {
+.schedule-header {
   display: flex;
-  max-width: 100%;
-  align-items: center;
-  gap: 0.5rem;
-  overflow-x: auto;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.legend-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
   border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--card);
-  padding: 0.375rem 0.625rem;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
-  scrollbar-width: none;
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.82);
+  padding: 1rem 1.125rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
 }
 
-.legend-group::-webkit-scrollbar {
-  display: none;
+.legend-column {
+  min-width: 0;
 }
 
-.legend-title {
-  flex: 0 0 auto;
-  border-right: 1px solid var(--border);
-  padding-right: 0.5rem;
-  font-size: 0.68rem;
+.legend-heading {
+  display: block;
+  margin-bottom: 0.625rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--muted-foreground);
   text-transform: uppercase;
 }
 
+.legend-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+}
+
+.legend-divider {
+  width: 1px;
+  background: var(--border);
+  justify-self: center;
+}
+
 .legend-item {
   display: inline-flex;
-  flex: 0 0 auto;
   align-items: center;
   gap: 0.35rem;
   font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--foreground);
+  font-weight: 500;
+  color: rgb(71 85 105);
   white-space: nowrap;
 }
 
@@ -44,6 +57,27 @@
   flex: 0 0 auto;
   border-radius: 999px;
   box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+}
+
+.calendar-surface {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 0.94);
+  box-shadow: 0 10px 30px rgb(15 23 42 / 0.05);
+}
+
+:host ::ng-deep .fc {
+  background: transparent;
+}
+
+:host ::ng-deep .fc-toolbar {
+  gap: 0.75rem;
+  padding: 1rem 1rem 0;
+}
+
+:host ::ng-deep .fc-view-harness {
+  padding: 0 0.5rem 0.5rem;
 }
 
 :host ::ng-deep .fc-event {
@@ -116,4 +150,66 @@
   flex: 0 0 auto;
   color: var(--muted-foreground);
   font-size: 0.68rem;
+}
+
+@media (min-width: 1200px) {
+  .schedule-header {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .legend-panel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.25rem;
+    border: none;
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .legend-column {
+    min-width: 0;
+    border: 1px solid rgb(226 232 240 / 0.9);
+    border-radius: 1rem;
+    background: rgb(255 255 255 / 0.92);
+    padding: 0.55rem 0.9rem;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  }
+
+  .legend-heading {
+    margin-bottom: 0.35rem;
+    font-size: 0.66rem;
+  }
+
+  .legend-list {
+    gap: 0.35rem 0.65rem;
+  }
+
+  .legend-divider {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .legend-panel {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+    padding: 0.875rem;
+  }
+
+  .legend-divider {
+    display: none;
+  }
+
+  :host ::ng-deep .fc-toolbar {
+    padding: 0.875rem 0.875rem 0;
+  }
+
+  :host ::ng-deep .fc-view-harness {
+    padding: 0 0.25rem 0.25rem;
+  }
 }
