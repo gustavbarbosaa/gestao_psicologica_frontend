@@ -7,11 +7,11 @@ export const loginGuard: CanMatchFn = () => {
   const loginService = inject(LoginService);
   const router = inject(Router);
 
-  if (loginService.isLogado()) {
+  if (loginService.isLogado()()) {
     return router.createUrlTree(['/home']);
   }
 
-  if (!loginService.isLogado()) {
+  if (!loginService.isLogado()()) {
     return true;
   }
 

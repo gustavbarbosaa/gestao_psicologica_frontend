@@ -7,11 +7,11 @@ export const authGuard: CanMatchFn = () => {
   const loginService = inject(LoginService);
   const router = inject(Router);
 
-  if (loginService.isLogado()) {
+  if (loginService.isLogado()()) {
     return true;
   }
 
-  if (!loginService.isLogado()) {
+  if (!loginService.isLogado()()) {
     router.navigate(['/login']);
     return false;
   }

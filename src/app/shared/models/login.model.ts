@@ -3,10 +3,15 @@ export interface iLoginRequest {
   senha: string;
 }
 
-export interface iLoginResponse {
+export interface iUsuarioAutenticado {
   id: string;
   nome: string;
   email: string;
   permissoes: string[];
   ativo: boolean;
+}
+
+export interface iLoginResponse {
+  token: string;
+  usuarioResponse: iUsuarioAutenticado;
 }
