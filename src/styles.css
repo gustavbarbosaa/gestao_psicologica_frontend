@@ -9,6 +9,11 @@ body {
   width: 100%;
 }
 
+html.app-scroll-locked,
+body.app-scroll-locked {
+  overflow: hidden;
+}
+
 @import 'tailwindcss';
 @plugin "tailwindcss-animate";
 

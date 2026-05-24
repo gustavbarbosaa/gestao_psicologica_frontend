@@ -43,6 +43,8 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   private readonly toastService = inject(ToastService);
   private readonly tipoAtendimentoService = inject(TipoAtendimentoService);
   private readonly DURACAO_PADRAO_EM_MINUTOS = 60;
+  private readonly MOBILE_BREAKPOINT = 640;
+  private resizeHandler?: () => void;
 
   protected calendarOptions!: CalendarOptions;
   protected eventosCalendario = signal<any[]>([]);
@@ -84,9 +86,14 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.carregarAgendamentosIniciais();
+    this.configurarCalendarioResponsivo();
   }
 
   ngOnDestroy(): void {
+    if (this.resizeHandler && typeof window !== 'undefined') {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -127,7 +134,43 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         minute: '2-digit',
         meridiem: false,
       },
+      height: 'auto',
+      expandRows: true,
     };
+  }
+
+  private configurarCalendarioResponsivo(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const aplicarLayout = () => {
+      const api = this.calendarComponent?.getApi();
+
+      if (!api) {
+        return;
+      }
+
+      const isMobile = window.innerWidth <= this.MOBILE_BREAKPOINT;
+      const targetView = isMobile ? 'timeGridDay' : 'timeGridWeek';
+
+      api.setOption('headerToolbar', {
+        left: 'prev,next today',
+        center: 'title',
+        right: isMobile ? 'timeGridDay,timeGridWeek' : 'dayGridMonth,timeGridWeek,timeGridDay',
+      });
+      api.setOption('dayHeaderFormat', isMobile ? { weekday: 'short', day: 'numeric' } : undefined);
+
+      if (api.view.type !== targetView) {
+        api.changeView(targetView);
+      }
+
+      api.updateSize();
+    };
+
+    aplicarLayout();
+    this.resizeHandler = aplicarLayout;
+    window.addEventListener('resize', this.resizeHandler, { passive: true });
   }
 
   handleEventResizeOrDrop(arg: EventResizeDoneArg | EventDropArg): void {

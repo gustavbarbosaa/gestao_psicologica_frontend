@@ -100,12 +100,14 @@
                 <z-icon zType="calendar" class="h-4 w-4 text-primary" />
                 Início
               </label>
-              <input
-                z-input
-                type="datetime-local"
-                formControlName="dataHoraInicio"
-                class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-              />
+              <div class="field-control">
+                <input
+                  z-input
+                  type="datetime-local"
+                  formControlName="dataHoraInicio"
+                  class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
             </div>
 
             <div class="space-y-1.5">
@@ -116,7 +118,7 @@
                 <z-icon zType="clock" class="h-4 w-4 text-primary" />
                 Duração
               </label>
-              <div class="relative">
+              <div class="field-control relative">
                 <input
                   z-input
                   type="number"
@@ -142,17 +144,19 @@
               Tipo de atendimento
             </label>
             @if (dadosCarregados()) {
-              <z-select
-                formControlName="tipoAtendimentoId"
-                zPlaceholder="Selecione o tipo de atendimento..."
-                class="block w-full"
-              >
-                @for (tipoAtendimento of tipoAtendimentos(); track tipoAtendimento.id) {
-                  <z-select-item [zValue]="tipoAtendimento.id">{{
-                    tipoAtendimento.nome
-                  }}</z-select-item>
-                }
-              </z-select>
+              <div class="field-control">
+                <z-select
+                  formControlName="tipoAtendimentoId"
+                  zPlaceholder="Selecione o tipo de atendimento..."
+                  class="block w-full"
+                >
+                  @for (tipoAtendimento of tipoAtendimentos(); track tipoAtendimento.id) {
+                    <z-select-item [zValue]="tipoAtendimento.id">{{
+                      tipoAtendimento.nome
+                    }}</z-select-item>
+                  }
+                </z-select>
+              </div>
             } @else {
               <div
                 class="h-10 w-full animate-pulse rounded-lg border border-slate-200 bg-slate-100"

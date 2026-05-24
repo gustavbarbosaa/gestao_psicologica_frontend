@@ -75,3 +75,29 @@
   background: var(--muted);
   color: var(--foreground);
 }
+
+.field-control {
+  min-width: 0;
+}
+
+.field-control input,
+.field-control button {
+  width: 100%;
+  min-width: 0;
+}
+
+.field-control input[type='datetime-local'] {
+  appearance: none;
+  min-height: 2.75rem;
+}
+
+.field-control z-select {
+  display: block;
+  width: 100%;
+}
+
+@media (max-width: 639px) {
+  .flow-action {
+    width: 100%;
+  }
+}

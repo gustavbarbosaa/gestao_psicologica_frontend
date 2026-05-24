@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { LayoutComponent } from '../layout/layout.component';
 import { ContentComponent } from '../layout/content.component';
 import { SidebarComponent } from '../layout/sidebar.component';
@@ -22,8 +23,9 @@ import { ZardIconComponent } from '../icon/icon.component';
   templateUrl: './layout-pages.html',
   styleUrl: './layout-pages.css',
 })
-export class LayoutPages implements OnInit {
+export class LayoutPages implements OnInit, OnDestroy {
   private loginService = inject(LoginService);
+  private readonly document = inject(DOCUMENT);
 
   usuario = this.loginService.usuario;
   protected readonly menuMobileAberto = signal(false);
@@ -34,9 +36,18 @@ export class LayoutPages implements OnInit {
 
   protected abrirMenuMobile(): void {
     this.menuMobileAberto.set(true);
+    this.document.body.classList.add('app-scroll-locked');
+    this.document.documentElement.classList.add('app-scroll-locked');
   }
 
   protected fecharMenuMobile(): void {
     this.menuMobileAberto.set(false);
+    this.document.body.classList.remove('app-scroll-locked');
+    this.document.documentElement.classList.remove('app-scroll-locked');
+  }
+
+  ngOnDestroy(): void {
+    this.document.body.classList.remove('app-scroll-locked');
+    this.document.documentElement.classList.remove('app-scroll-locked');
   }
 }
