@@ -20,6 +20,7 @@ export class Login implements OnInit {
   protected readonly idPassword = generateId('password');
   protected loginForm!: FormGroup;
   protected loading = signal<boolean>(false);
+  protected credenciaisInvalidas = signal<boolean>(false);
 
   private readonly formBuilderService = inject(NonNullableFormBuilder);
   private readonly loginService = inject(LoginService);
@@ -32,17 +33,25 @@ export class Login implements OnInit {
 
   private initLoginForm(): void {
     this.loginForm = this.formBuilderService.group({
-      email: ['', [Validators.email]],
-      senha: ['', [Validators.minLength(6), Validators.maxLength(20)]],
+      email: ['', [Validators.required, Validators.email]],
+      senha: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(20)]],
+    });
+
+    this.loginForm.valueChanges.subscribe(() => {
+      if (this.credenciaisInvalidas()) {
+        this.credenciaisInvalidas.set(false);
+      }
     });
   }
 
   protected signIn(): void {
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
     this.loading.set(true);
+    this.credenciaisInvalidas.set(false);
     const loginData = this.loginForm.getRawValue();
 
     this.loginService.login(loginData).subscribe({
@@ -53,7 +62,8 @@ export class Login implements OnInit {
       },
       error: () => {
         this.loading.set(false);
-        this.toastService.exibirToastErro('Erro', 'Verifique suas credenciais!');
+        this.credenciaisInvalidas.set(true);
+        this.loginForm.markAllAsTouched();
       },
       complete: () => {
         this.loading.set(false);
