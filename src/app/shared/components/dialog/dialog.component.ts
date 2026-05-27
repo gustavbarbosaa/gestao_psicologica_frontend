@@ -75,7 +75,7 @@ export class ZardDialogOptions<T, U> {
     }
 
     @if (config.zTitle || config.zDescription) {
-      <header class="flex flex-col space-y-1.5 text-center sm:text-left">
+      <header class="shrink-0 flex flex-col space-y-1.5 pr-10 text-center sm:text-left">
         @if (config.zTitle) {
           <h4 data-testid="z-title" class="text-lg leading-none font-semibold tracking-tight">
             {{ config.zTitle }}
@@ -90,16 +90,18 @@ export class ZardDialogOptions<T, U> {
       </header>
     }
 
-    <main class="flex flex-col space-y-4">
-      <ng-template cdkPortalOutlet />
+    <main class="min-h-0 flex-1 overflow-y-auto pr-1">
+      <div class="flex flex-col space-y-4">
+        <ng-template cdkPortalOutlet />
 
-      @if (isStringContent) {
-        <div data-testid="z-content" [innerHTML]="config.zContent"></div>
-      }
+        @if (isStringContent) {
+          <div data-testid="z-content" [innerHTML]="config.zContent"></div>
+        }
+      </div>
     </main>
 
     @if (!config.zHideFooter) {
-      <footer class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+      <footer class="shrink-0 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
         @if (config.zCancelText !== null) {
           <button
             type="button"

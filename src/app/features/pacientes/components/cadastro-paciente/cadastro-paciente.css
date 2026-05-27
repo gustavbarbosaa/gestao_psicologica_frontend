@@ -41,3 +41,13 @@
   background: var(--muted);
   color: var(--foreground);
 }
+
+@media (max-width: 639px) {
+  .patient-actions {
+    flex-direction: column-reverse;
+  }
+
+  .patient-action {
+    width: 100%;
+  }
+}

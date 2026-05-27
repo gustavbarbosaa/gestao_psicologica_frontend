@@ -100,4 +100,8 @@
   .flow-action {
     width: 100%;
   }
+
+  :host {
+    display: block;
+  }
 }

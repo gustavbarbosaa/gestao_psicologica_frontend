@@ -1,5 +1,7 @@
-<div class="w-full bg-white rounded-md shadow-md overflow-hidden">
-  <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+<div class="w-full overflow-hidden rounded-md bg-white shadow-md">
+  <div
+    class="flex items-center justify-between border-b border-slate-100 bg-slate-50/30 px-4 py-4 sm:px-6 sm:py-5"
+  >
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
         <z-icon zType="calendar-plus" />
@@ -11,7 +13,7 @@
     </div>
   </div>
 
-  <form [formGroup]="form" class="p-6 space-y-5">
+  <form [formGroup]="form" class="space-y-4 p-4 sm:space-y-5 sm:p-6">
     <div class="space-y-1.5">
       <label for="pacienteId" class="text-sm font-semibold text-slate-700 flex items-center gap-2">
         <z-icon zType="user" class="w-4 h-4 text-primary" />
