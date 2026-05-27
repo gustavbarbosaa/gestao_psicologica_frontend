@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { EsqueceuSenha } from '@features/login/components/esqueceu-senha/esqueceu-senha';
 import { ZardButtonComponent } from '@shared/components/button/button.component';
 import { ZardCardComponent } from '@shared/components/card/card.component';
 import { generateId } from '@shared/utils/merge-classes';
@@ -8,10 +7,11 @@ import { LoginService } from '@core/services/login-service';
 import { Router } from '@angular/router';
 import { ToastService } from '@shared/services/toast-service';
 import { Logo } from '@shared/components/logo/logo';
+import { ZardIconComponent } from '@shared/components/icon';
 
 @Component({
   selector: 'app-login',
-  imports: [ZardButtonComponent, ZardCardComponent, EsqueceuSenha, ReactiveFormsModule, Logo],
+  imports: [ZardButtonComponent, ZardCardComponent, ReactiveFormsModule, Logo, ZardIconComponent],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -21,6 +21,7 @@ export class Login implements OnInit {
   protected loginForm!: FormGroup;
   protected loading = signal<boolean>(false);
   protected credenciaisInvalidas = signal<boolean>(false);
+  protected mostrarSenha = signal<boolean>(false);
 
   private readonly formBuilderService = inject(NonNullableFormBuilder);
   private readonly loginService = inject(LoginService);
@@ -69,5 +70,9 @@ export class Login implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  protected toggleExibirSenha(): void {
+    this.mostrarSenha.update((mostrar) => !mostrar);
   }
 }

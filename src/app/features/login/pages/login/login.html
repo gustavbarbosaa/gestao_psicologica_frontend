@@ -51,17 +51,26 @@
               Senha
             </label>
           </div>
-          <input
-            z-input
-            formControlName="senha"
-            [id]="idPassword"
-            type="password"
-            placeholder="****************"
-            class="border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          <div
+            class="items-center border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-full w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             [class.border-red-500]="credenciaisInvalidas()"
             [class.focus-visible:ring-red-200]="credenciaisInvalidas()"
-            required
-          />
+          >
+            <input
+              z-input
+              formControlName="senha"
+              [id]="idPassword"
+              [type]="mostrarSenha() ? 'text' : 'password'"
+              placeholder="****************"
+              class="outline-none w-full bg-transparent h-full"
+              required
+            />
+            <z-icon
+              [zType]="mostrarSenha() ? 'eyeOff' : 'eye'"
+              class="text-muted-foreground cursor-pointer"
+              (click)="toggleExibirSenha()"
+            />
+          </div>
         </div>
         @if (credenciaisInvalidas()) {
           <p class="text-center text-sm font-medium text-red-600">
@@ -78,6 +87,5 @@
         </div>
       </form>
     </z-card>
-    <app-esqueceu-senha />
   </section>
 </div>
