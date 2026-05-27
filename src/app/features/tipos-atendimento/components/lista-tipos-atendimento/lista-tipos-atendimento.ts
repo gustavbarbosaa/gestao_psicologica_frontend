@@ -20,6 +20,7 @@ import { ZardButtonComponent } from '@shared/components/button/button.component'
   standalone: true,
   imports: [CommonModule, ZardIconComponent, ZardButtonComponent],
   templateUrl: './lista-tipos-atendimento.html',
+  styleUrl: './lista-tipos-atendimento.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListaTiposAtendimento implements OnInit {

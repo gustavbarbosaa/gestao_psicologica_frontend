@@ -1,0 +1,66 @@
+@media (max-width: 767px) {
+  .patients-table-wrapper {
+    overflow: visible;
+  }
+
+  .patients-table-head {
+    display: none;
+  }
+
+  .patients-table,
+  .patients-table tbody,
+  .patients-table tr,
+  .patients-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .patients-table tbody {
+    display: grid;
+    gap: 0.875rem;
+  }
+
+  .patients-row {
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1rem;
+    background: white;
+    box-shadow: 0 10px 30px -24px rgb(15 23 42 / 0.35);
+    overflow: hidden;
+  }
+
+  .patients-row td {
+    display: grid;
+    grid-template-columns: minmax(0, 6rem) minmax(0, 1fr);
+    align-items: start;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    text-align: left;
+  }
+
+  .patients-row td::before {
+    content: attr(data-label);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(100 116 139);
+  }
+
+  .patients-row td + td {
+    border-top: 1px solid rgb(241 245 249);
+  }
+
+  .patients-row td:first-child {
+    background: linear-gradient(180deg, rgb(248 250 252), white);
+  }
+
+  .patients-actions-cell {
+    align-items: center;
+  }
+
+  .patients-actions {
+    width: 100%;
+    justify-content: flex-start;
+    opacity: 1;
+  }
+}

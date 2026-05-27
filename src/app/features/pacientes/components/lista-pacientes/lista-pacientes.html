@@ -1,6 +1,6 @@
-<div class="w-full overflow-x-auto">
-  <table class="w-full text-left border-collapse">
-    <thead>
+<div class="patients-table-wrapper">
+  <table class="patients-table w-full border-collapse text-left">
+    <thead class="patients-table-head">
       <tr
         class="bg-slate-50/80 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500 tracking-wider"
       >
@@ -12,8 +12,8 @@
     </thead>
     <tbody class="divide-y divide-slate-100">
       @for (paciente of pacientesFiltrados(); track paciente.id) {
-        <tr class="hover:bg-slate-50/80 transition-colors group">
-          <td class="px-6 py-4">
+        <tr class="patients-row hover:bg-slate-50/80 transition-colors group">
+          <td class="px-6 py-4" data-label="Paciente">
             <div class="flex items-center gap-3">
               <div
                 class="w-10 h-10 rounded-full bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center font-bold text-sm"
@@ -28,7 +28,7 @@
             </div>
           </td>
 
-          <td class="px-6 py-4">
+          <td class="px-6 py-4" data-label="Contato">
             <div class="flex flex-col gap-1">
               <div class="flex items-center gap-1.5 text-sm text-slate-600">
                 <z-icon zType="mail" class="w-3.5 h-3.5 text-slate-400" />
@@ -41,7 +41,7 @@
             </div>
           </td>
 
-          <td class="px-6 py-4 text-center">
+          <td class="px-6 py-4 text-center" data-label="Status">
             <span
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
               [ngClass]="{
@@ -53,9 +53,9 @@
             </span>
           </td>
 
-          <td class="px-6 py-4 text-right">
+          <td class="patients-actions-cell px-6 py-4 text-right" data-label="Ações">
             <div
-              class="flex items-center justify-end gap-1 opacity-50 group-hover:opacity-100 transition-all duration-200"
+              class="patients-actions flex items-center justify-end gap-1 opacity-50 transition-all duration-200 group-hover:opacity-100"
             >
               <button
                 type="button"

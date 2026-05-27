@@ -20,9 +20,9 @@
     </button>
   </div>
 
-  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    <table class="w-full text-left border-collapse">
-      <thead>
+  <div class="service-types-table-wrapper rounded-xl border border-slate-200 bg-white shadow-sm">
+    <table class="service-types-table w-full border-collapse text-left">
+      <thead class="service-types-table-head">
         <tr
           class="bg-slate-50/80 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500 tracking-wider"
         >
@@ -33,17 +33,17 @@
       </thead>
       <tbody class="divide-y divide-slate-100">
         @for (tipo of tipos(); track tipo.id) {
-          <tr class="hover:bg-slate-50/80 transition-colors group">
-            <td class="px-6 py-4">
+          <tr class="service-types-row hover:bg-slate-50/80 transition-colors group">
+            <td class="service-type-name-cell px-6 py-4" data-label="Nome">
               <div class="flex items-center gap-3">
                 <div
-                  class="w-10 h-10 rounded-full bg-slate-50 text-slate-700 border border-slate-100 flex items-center justify-center font-bold text-sm"
+                  class="service-type-avatar w-10 h-10 rounded-full bg-slate-50 text-slate-700 border border-slate-100 flex items-center justify-center font-bold text-sm"
                 >
                   {{ tipo.nome.charAt(0).toUpperCase() }}
                 </div>
-                <div>
+                <div class="min-w-0">
                   <p
-                    class="font-semibold text-slate-700 group-hover:text-teal-700 transition-colors"
+                    class="truncate font-semibold text-slate-700 group-hover:text-teal-700 transition-colors"
                   >
                     {{ tipo.nome }}
                   </p>
@@ -51,15 +51,15 @@
               </div>
             </td>
 
-            <td class="px-6 py-4">
-              <div class="text-slate-700">
-                {{ tipo.valorPadraoTipoAtendimento | number: '1.2-2' }}
+            <td class="service-type-price-cell px-6 py-4" data-label="Valor padrão">
+              <div class="service-type-price text-slate-700">
+                R$ {{ tipo.valorPadraoTipoAtendimento | number: '1.2-2' }}
               </div>
             </td>
 
-            <td class="px-6 py-4 text-right">
+            <td class="service-types-actions-cell px-6 py-4 text-right" data-label="Ações">
               <div
-                class="flex items-center justify-end gap-1 opacity-50 group-hover:opacity-100 transition-all duration-200"
+                class="service-types-actions flex items-center justify-end gap-1 opacity-50 transition-all duration-200 group-hover:opacity-100"
               >
                 <button
                   type="button"

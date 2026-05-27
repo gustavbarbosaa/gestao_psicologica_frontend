@@ -20,9 +20,9 @@
 
   <form
     [formGroup]="formFiltro"
-    class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+    class="patients-panel bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
   >
-    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex gap-3">
+    <div class="patients-filters p-4 border-b border-slate-100 bg-slate-50/50 flex gap-3">
       <z-input-group [zAddonBefore]="search" class="mb-4">
         <input z-input placeholder="Pesquisar..." formControlName="nome" />
       </z-input-group>
@@ -36,6 +36,6 @@
 
     <ng-template #search><z-icon zType="search" /></ng-template>
 
-    <app-lista-pacientes #lista />
+    <app-lista-pacientes #lista class="patients-list-region" />
   </form>
 </div>

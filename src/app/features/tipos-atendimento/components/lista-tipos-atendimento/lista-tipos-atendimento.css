@@ -6,3 +6,87 @@
 .text-right {
   text-align: right;
 }
+
+@media (max-width: 767px) {
+  .service-types-table-wrapper {
+    overflow: visible;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .service-types-table-head {
+    display: none;
+  }
+
+  .service-types-table,
+  .service-types-table tbody,
+  .service-types-table tr,
+  .service-types-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .service-types-table tbody {
+    display: grid;
+    gap: 0.875rem;
+  }
+
+  .service-types-row {
+    display: block;
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1.125rem;
+    background: white;
+    box-shadow: 0 12px 24px -28px rgb(15 23 42 / 0.45);
+    padding: 1rem;
+  }
+
+  .service-types-row td {
+    display: block;
+    width: 100%;
+    padding: 0;
+    text-align: left;
+  }
+
+  .service-type-name-cell {
+    margin-bottom: 0.5rem;
+  }
+
+  .service-type-price-cell {
+    margin-bottom: 0.875rem;
+  }
+
+  .service-type-price {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgb(71 85 105);
+  }
+
+  .service-types-actions-cell {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .service-types-actions {
+    width: 100%;
+    justify-content: flex-start;
+    opacity: 1;
+    gap: 0.5rem;
+  }
+
+  .service-type-avatar {
+    height: 2.5rem;
+    width: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .service-types-actions-cell {
+    padding-top: 0;
+  }
+
+  .service-types-actions button {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+}
