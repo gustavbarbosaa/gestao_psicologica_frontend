@@ -11,14 +11,32 @@
         Organize sua clínica com leveza."
       </h1>
       <footer>
-        <small>© 2026 PsiManager</small>
+        <small>© 2026 Mentis</small>
       </footer>
     </div>
   </section>
-  <section class="w-full flex flex-col min-h-screen items-center justify-center px-4 gap-8">
-    <app-logo [logoReduzida]="true" />
+  <section class="login-panel w-full flex flex-col min-h-screen items-center justify-center px-4 gap-8">
+    <div class="mobile-login-hero sm:hidden">
+      <div class="mobile-login-hero__backdrop"></div>
+      <div class="mobile-login-hero__content">
+        <div class="mobile-login-hero__brand">
+          <app-logo [logoReduzida]="false" />
+        </div>
+        <div class="mobile-login-hero__copy">
+          <span class="mobile-login-hero__eyebrow">Gestão clínica com clareza</span>
+          <h1>Mentis</h1>
+          <p>
+            Sua rotina clínica organizada em um fluxo simples, leve e profissional.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="hidden sm:block">
+      <app-logo [logoReduzida]="true" />
+    </div>
     <z-card
-      class="w-full max-w-sm px-6 py-8 shadow-lg border-[0.2px] border-gray-200"
+      class="login-card w-full max-w-sm px-6 py-8 shadow-lg border-[0.2px] border-gray-200"
       zTitle="Entrar com sua conta"
       zDescription="Digite seu email abaixo para entrar na sua conta"
     >
