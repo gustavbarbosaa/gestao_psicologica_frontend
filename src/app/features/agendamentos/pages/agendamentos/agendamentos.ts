@@ -400,7 +400,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
           return this.alterarStatusAtendimento(agendamento.id, status);
         },
         onConfirmarPagamento: () => {
-          this.alterarStatusPagamento(agendamento.id, 'CONFIRMADO');
+          return this.alterarStatusPagamento(agendamento.id, 'CONFIRMADO');
         },
         onGerarCobranca: () => {
           return this.gerarCobrancaPagamento(agendamento.id);
@@ -515,20 +515,24 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
-  private alterarStatusPagamento(agendamentoId: string, status: StatusPagamento): void {
-    this.pagamentoService.alterarStatusPagamento(agendamentoId, status).subscribe({
-      next: (agendamento) => {
+  private alterarStatusPagamento(
+    agendamentoId: string,
+    status: StatusPagamento,
+  ): Observable<iAgendamentoResponse> {
+    return this.pagamentoService.alterarStatusPagamento(agendamentoId, status).pipe(
+      tap((agendamento) => {
         this.toastService.exibirToastSucesso(
           'Pagamento atualizado',
           `Pagamento marcado como ${this.getLabelStatus(status)}.`,
         );
         this.atualizarEventoNoCalendario(agendamento);
-      },
-      error: (err) => {
+      }),
+      catchError((err) => {
         const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Tente novamente.';
         this.toastService.exibirToastErro('Erro ao atualizar pagamento', mensagem);
-      },
-    });
+        return throwError(() => err);
+      }),
+    );
   }
 
   private gerarCobrancaPagamento(agendamentoId: string): Observable<iAgendamentoResponse> {

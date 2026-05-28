@@ -37,7 +37,7 @@ type EditarAgendamentoModalData = {
   tipoAtendimentoId?: string;
   agendamento?: iAgendamentoResponse;
   onChangeStatusAtendimento?: (status: StatusAtendimento) => Observable<iAgendamentoResponse>;
-  onConfirmarPagamento?: () => void;
+  onConfirmarPagamento?: () => Observable<iAgendamentoResponse>;
   onGerarCobranca?: () => Observable<iAgendamentoResponse>;
 };
 
@@ -339,10 +339,20 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   }
 
   confirmarPagamento(): void {
-    this.agendamento.update((agendamento) =>
-      agendamento ? { ...agendamento, statusPagamento: 'CONFIRMADO' } : agendamento,
-    );
-    this.modalData?.onConfirmarPagamento?.();
+    const request = this.modalData?.onConfirmarPagamento?.();
+
+    if (!request) {
+      return;
+    }
+
+    request.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (agendamento) => {
+        this.agendamento.set(agendamento);
+      },
+      error: () => {
+        // O toast de erro é exibido pela tela de agendamentos.
+      },
+    });
   }
 
   gerarCobranca(): void {
