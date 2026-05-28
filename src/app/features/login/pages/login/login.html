@@ -55,8 +55,8 @@
             type="email"
             placeholder="email@exemplo.com"
             class="border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-10 w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            [class.border-red-500]="credenciaisInvalidas()"
-            [class.focus-visible:ring-red-200]="credenciaisInvalidas()"
+            [class.border-red-500]="credenciaisInvalidas() || usuarioInativo()"
+            [class.focus-visible:ring-red-200]="credenciaisInvalidas() || usuarioInativo()"
             required
           />
         </div>
@@ -71,8 +71,8 @@
           </div>
           <div
             class="items-center border-input bg-background ring-offset-background placeholder:text-muted-foreground flex h-full w-full rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            [class.border-red-500]="credenciaisInvalidas()"
-            [class.focus-visible:ring-red-200]="credenciaisInvalidas()"
+            [class.border-red-500]="credenciaisInvalidas() || usuarioInativo()"
+            [class.focus-visible:ring-red-200]="credenciaisInvalidas() || usuarioInativo()"
           >
             <input
               z-input
@@ -93,6 +93,11 @@
         @if (credenciaisInvalidas()) {
           <p class="text-center text-sm font-medium text-red-600">
             Verifique suas credenciais e tente novamente.
+          </p>
+        }
+        @if (usuarioInativo()) {
+          <p class="text-center text-sm font-medium text-amber-700">
+            Seu usuário está bloqueado. Entre em contato com o administrador.
           </p>
         }
         <div class="space-y-2">

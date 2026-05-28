@@ -21,6 +21,7 @@ export class Login implements OnInit {
   protected loginForm!: FormGroup;
   protected loading = signal<boolean>(false);
   protected credenciaisInvalidas = signal<boolean>(false);
+  protected usuarioInativo = signal<boolean>(false);
   protected mostrarSenha = signal<boolean>(false);
 
   private readonly formBuilderService = inject(NonNullableFormBuilder);
@@ -42,6 +43,10 @@ export class Login implements OnInit {
       if (this.credenciaisInvalidas()) {
         this.credenciaisInvalidas.set(false);
       }
+
+      if (this.usuarioInativo()) {
+        this.usuarioInativo.set(false);
+      }
     });
   }
 
@@ -53,6 +58,7 @@ export class Login implements OnInit {
 
     this.loading.set(true);
     this.credenciaisInvalidas.set(false);
+    this.usuarioInativo.set(false);
     const loginData = this.loginForm.getRawValue();
 
     this.loginService.login(loginData).subscribe({
@@ -61,9 +67,15 @@ export class Login implements OnInit {
         this.toastService.exibirToastSucesso('Sucesso', 'Redirecionando para a página principal!');
         this.router.navigate(['/home']);
       },
-      error: () => {
+      error: (err) => {
         this.loading.set(false);
-        this.credenciaisInvalidas.set(true);
+
+        if (err.status === 403) {
+          this.usuarioInativo.set(true);
+        } else {
+          this.credenciaisInvalidas.set(true);
+        }
+
         this.loginForm.markAllAsTouched();
       },
       complete: () => {
