@@ -11,11 +11,13 @@ export class LoginService {
   private static readonly TOKEN_STORAGE_KEY = 'auth_token';
 
   private httpClient: HttpClient = inject(HttpClient);
-  private API_URL: string = environment.apiUrl;
-  private LOGIN_PATH: string = 'autenticacao/login';
-  private LOGOUT_PATH: string = 'autenticacao/logout';
-  private CADASTRO_PATH: string = 'autenticacao/cadastro';
-  private ME_PATH: string = 'autenticacao/me';
+  private readonly API_URL: string = environment.apiUrl;
+  private readonly LOGIN_PATH: string = 'autenticacao/login';
+  private readonly LOGOUT_PATH: string = 'autenticacao/logout';
+  private readonly CADASTRO_PATH: string = 'autenticacao/cadastro';
+  private readonly ME_PATH: string = 'autenticacao/me';
+
+  private readonly PAPEL_ADMIN = 'PAPEL_ADMIN';
 
   protected readonly usuarioLogado = signal<boolean>(false);
   usuario = signal<iUsuarioAutenticado | null>(null);
@@ -73,6 +75,57 @@ export class LoginService {
 
   isLogado(): Signal<boolean> {
     return this.usuarioLogado.asReadonly();
+  }
+
+  isAdmin(): boolean {
+    return this.hasAuthority(this.PAPEL_ADMIN);
+  }
+
+  hasAuthority(authority: string): boolean {
+    const authorities = this.getAuthorities();
+    return authorities.includes(authority);
+  }
+
+  private getAuthorities(): string[] {
+    const authoritiesFromUsuario = this.usuario()?.authorities;
+
+    if (Array.isArray(authoritiesFromUsuario) && authoritiesFromUsuario.length > 0) {
+      return authoritiesFromUsuario;
+    }
+
+    return this.getAuthoritiesFromToken();
+  }
+
+  private getAuthoritiesFromToken(): string[] {
+    const token = localStorage.getItem(LoginService.TOKEN_STORAGE_KEY);
+
+    if (!token) {
+      return [];
+    }
+
+    const partes = token.split('.');
+
+    if (partes.length < 2) {
+      return [];
+    }
+
+    try {
+      const payload = JSON.parse(this.decodeBase64Url(partes[1])) as {
+        authorities?: unknown;
+      };
+
+      return Array.isArray(payload.authorities)
+        ? payload.authorities.filter((item): item is string => typeof item === 'string')
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private decodeBase64Url(valor: string): string {
+    const base64 = valor.replace(/-/g, '+').replace(/_/g, '/');
+    const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+    return atob(base64 + padding);
   }
 
   private hasToken(): boolean {

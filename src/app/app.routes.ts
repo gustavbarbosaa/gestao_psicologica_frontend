@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '@core/guards/admin-guard';
 import { authGuard } from '@core/guards/auth-guard';
 import { loginGuard } from '@core/guards/login-guard';
 
@@ -43,6 +44,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/financeiro/pages/financeiro/financeiro').then((m) => m.Financeiro),
     canMatch: [authGuard],
+  },
+  {
+    path: 'usuarios',
+    loadComponent: () =>
+      import('./features/usuarios/pages/usuarios/usuarios').then((m) => m.Usuarios),
+    canMatch: [adminGuard],
   },
   {
     path: '**',

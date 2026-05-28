@@ -1,0 +1,118 @@
+<div class="space-y-6 animate-in fade-in duration-500">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Usuários</h1>
+      <p class="text-slate-500 text-sm mt-1">
+        Gerencie a situação dos usuários cadastrados na administração.
+      </p>
+    </div>
+
+    <div
+      class="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-amber-700"
+    >
+      <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+      Área administrativa
+    </div>
+  </div>
+
+  <section class="users-panel bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="users-table-wrapper">
+      <table class="users-table w-full border-collapse text-left">
+        <thead class="users-table-head">
+          <tr
+            class="bg-slate-50/80 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500 tracking-wider"
+          >
+            <th class="px-6 py-4">Usuário</th>
+            <th class="px-6 py-4">E-mail</th>
+            <th class="px-6 py-4 text-center">Situação</th>
+            <th class="px-6 py-4 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @if (loading()) {
+            <tr>
+              <td colspan="4" class="px-6 py-16 text-center text-slate-500">
+                Carregando usuários...
+              </td>
+            </tr>
+          } @else {
+            @for (usuario of usuariosOrdenados(); track usuario.id) {
+              <tr class="users-row hover:bg-slate-50/80 transition-colors group">
+                <td class="px-6 py-4" data-label="Usuário">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="w-10 h-10 rounded-full bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center font-bold text-sm"
+                    >
+                      {{ getIniciais(usuario.nome) }}
+                    </div>
+                    <div>
+                      <p class="font-semibold text-slate-700 group-hover:text-amber-700 transition-colors">
+                        {{ usuario.nome }}
+                      </p>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4" data-label="E-mail">
+                  <div class="flex items-center gap-1.5 text-sm text-slate-600">
+                    <z-icon zType="mail" class="w-3.5 h-3.5 text-slate-400" />
+                    <span>{{ usuario.email }}</span>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 text-center" data-label="Situação">
+                  <span
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                    [ngClass]="{
+                      'bg-emerald-50 text-emerald-700 border-emerald-100': usuario.ativo,
+                      'bg-slate-100 text-slate-500 border-slate-200': !usuario.ativo,
+                    }"
+                  >
+                    {{ usuario.ativo ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+
+                <td class="users-actions-cell px-6 py-4 text-right" data-label="Ações">
+                  <div
+                    class="users-actions flex items-center justify-end gap-1.5 opacity-70 transition-all duration-200 group-hover:opacity-100"
+                  >
+                    <button
+                      type="button"
+                      class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                      [disabled]="atualizandoUsuarioId() === usuario.id"
+                      [ngClass]="{
+                        'bg-slate-900 text-white hover:bg-slate-800': !usuario.ativo,
+                        'bg-red-50 text-red-700 hover:bg-red-100': usuario.ativo,
+                        'opacity-60 cursor-not-allowed': atualizandoUsuarioId() === usuario.id,
+                      }"
+                      (click)="alternarSituacao(usuario)"
+                    >
+                      {{
+                        atualizandoUsuarioId() === usuario.id
+                          ? 'Atualizando...'
+                          : usuario.ativo
+                            ? 'Inativar'
+                            : 'Ativar'
+                      }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="px-6 py-16 text-center">
+                  <div class="flex flex-col items-center justify-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
+                      <z-icon zType="users" class="w-6 h-6 text-slate-300" />
+                    </div>
+                    <p class="text-slate-500 font-medium">Nenhum usuário encontrado.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

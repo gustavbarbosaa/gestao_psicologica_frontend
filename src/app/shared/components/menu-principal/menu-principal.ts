@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { iOpcaoMenuLateral } from '@shared/models/opcao-menu.model';
 import { ZardIconComponent } from '../icon/icon.component';
 import { RouterLink } from '@angular/router';
@@ -12,16 +12,14 @@ import { ToastService } from '@shared/services/toast-service';
   templateUrl: './menu-principal.html',
   styleUrl: './menu-principal.css',
 })
-export class MenuPrincipal implements OnInit {
+export class MenuPrincipal {
   private loginService = inject(LoginService);
   private toastService = inject(ToastService);
 
   protected loading = signal<boolean>(false);
-
-  listaMenus: iOpcaoMenuLateral[] = [];
-
-  private iniciarListaMenus(): void {
-    this.listaMenus = [
+  protected readonly isAdmin = computed(() => this.loginService.isAdmin());
+  protected readonly listaMenus = computed(() => {
+    const menus: iOpcaoMenuLateral[] = [
       {
         icone: 'layout-dashboard',
         titulo: 'Dashboard',
@@ -48,11 +46,17 @@ export class MenuPrincipal implements OnInit {
         url: '/financeiro',
       },
     ];
-  }
 
-  ngOnInit(): void {
-    this.iniciarListaMenus();
-  }
+    if (this.isAdmin()) {
+      menus.push({
+        icone: 'shield',
+        titulo: 'Usuários',
+        url: '/usuarios',
+      });
+    }
+
+    return menus;
+  });
 
   logout(): void {
     this.loading.set(true);
