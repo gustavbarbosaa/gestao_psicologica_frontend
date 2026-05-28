@@ -172,7 +172,7 @@ export class HomePage implements OnInit {
   }
 
   protected valorAgendamento(agendamento: iAgendamentoResponse): number {
-    return Number(agendamento.tipoAtendimento?.valorPadraoTipoAtendimento ?? 0);
+    return Number(agendamento.valorAtendimento ?? 0);
   }
 
   protected getIniciais(nomePaciente: string): string {

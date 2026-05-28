@@ -22,6 +22,7 @@ export interface iAgendamentoResponse {
   statusAtendimento: StatusAtendimento;
   usuario: iLoginResponse;
   tipoAtendimento: iTipoAtendimento;
+  valorAtendimento: number;
 }
 
 export interface iAgendamentoRequest {

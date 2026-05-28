@@ -210,7 +210,7 @@ export class Financeiro implements OnInit {
   }
 
   protected valorAgendamento(agendamento: iAgendamentoResponse): number {
-    return Number(agendamento.tipoAtendimento?.valorPadraoTipoAtendimento ?? 0);
+    return Number(agendamento.valorAtendimento ?? 0);
   }
 
   protected getIniciais(nomePaciente: string): string {
@@ -356,7 +356,7 @@ export class Financeiro implements OnInit {
     if (!valorAtendimento) {
       this.toastService.exibirToastErro(
         'Valor não informado',
-        'Cadastre o valor padrão do tipo de atendimento.',
+        'Não foi possível identificar o valor deste atendimento.',
       );
       return null;
     }

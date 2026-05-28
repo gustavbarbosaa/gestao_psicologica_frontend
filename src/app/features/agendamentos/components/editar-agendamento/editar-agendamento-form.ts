@@ -462,13 +462,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   }
 
   private getValorAtendimentoSelecionado(): number | null {
-    const tipoAtendimentoId = this.form.controls.tipoAtendimentoId.value;
-    const tipoAtendimentoSelecionado = this.tipoAtendimentos().find(
-      (tipoAtendimento) => tipoAtendimento.id === tipoAtendimentoId,
-    );
-    const valor =
-      tipoAtendimentoSelecionado?.valorPadraoTipoAtendimento ??
-      this.agendamento()?.tipoAtendimento.valorPadraoTipoAtendimento;
+    const valor = this.agendamento()?.valorAtendimento;
 
     return typeof valor === 'number' ? valor : null;
   }
