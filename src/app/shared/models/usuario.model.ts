@@ -5,3 +5,9 @@ export interface iUsuarioResponse {
   ativo: boolean;
   authorities: string[];
 }
+
+export interface iUsuarioCadastroRequest {
+  nome: string;
+  email: string;
+  senha: string;
+}

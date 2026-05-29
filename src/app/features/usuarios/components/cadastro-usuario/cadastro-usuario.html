@@ -1,0 +1,73 @@
+<div class="w-full bg-white">
+  <div class="rounded-xl border border-slate-100 bg-white shadow-sm">
+    <div class="flex items-center gap-3 border-b border-slate-100 bg-slate-50/60 px-5 py-4">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700">
+        <z-icon zType="shield" />
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-slate-800">Novo Usuário</h2>
+        <p class="text-xs text-slate-500">Cadastro exclusivo da administração.</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="salvar()" class="space-y-4 p-4 sm:space-y-5 sm:p-5">
+      <section class="grid gap-4">
+        <div class="space-y-1.5">
+          <label for="nome" class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <z-icon zType="user" class="h-4 w-4 text-amber-700" />
+            Nome completo
+          </label>
+          <input
+            z-input
+            id="nome"
+            formControlName="nome"
+            placeholder="Insira o nome do profissional..."
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-100"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="email" class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <z-icon zType="mail" class="h-4 w-4 text-amber-700" />
+            Email
+          </label>
+          <input
+            z-input
+            id="email"
+            formControlName="email"
+            placeholder="email@exemplo.com"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-100"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="senha" class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+            <z-icon zType="shield" class="h-4 w-4 text-amber-700" />
+            Senha
+          </label>
+          <input
+            z-input
+            id="senha"
+            type="password"
+            formControlName="senha"
+            placeholder="Mínimo de 6 caracteres"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-2 focus:ring-amber-100"
+          />
+        </div>
+      </section>
+
+      <div class="flex justify-end gap-2 border-t border-slate-100 pt-4">
+        <button type="button" class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100" (click)="cancelar()">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+          [disabled]="form.invalid"
+        >
+          Salvar usuário
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

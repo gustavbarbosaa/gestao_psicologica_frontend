@@ -1,6 +1,8 @@
 import { CommonModule, NgClass } from '@angular/common';
 import { Component, computed, inject, OnInit, signal, ViewContainerRef } from '@angular/core';
 import { UsuarioService } from '@core/services/usuario-service';
+import { CadastroUsuario } from '@features/usuarios/components/cadastro-usuario/cadastro-usuario';
+import { ZardButtonComponent } from '@shared/components/button/button.component';
 import { ZardDialogService } from '@shared/components/dialog/dialog.service';
 import { ZardIconComponent } from '@shared/components/icon';
 import { iUsuarioResponse } from '@shared/models/usuario.model';
@@ -8,7 +10,7 @@ import { ToastService } from '@shared/services/toast-service';
 
 @Component({
   selector: 'app-usuarios',
-  imports: [CommonModule, NgClass, ZardIconComponent],
+  imports: [CommonModule, NgClass, ZardIconComponent, ZardButtonComponent],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css',
 })
@@ -28,6 +30,18 @@ export class Usuarios implements OnInit {
 
   ngOnInit(): void {
     this.carregarUsuarios();
+  }
+
+  protected abrirCadastroUsuario(): void {
+    this.dialog.create({
+      zContent: CadastroUsuario,
+      zTitle: 'Novo usuário',
+      zHideFooter: true,
+      zViewContainerRef: this.vcr,
+      zData: {
+        onSaved: () => this.carregarUsuarios(),
+      },
+    });
   }
 
   protected carregarUsuarios(): void {

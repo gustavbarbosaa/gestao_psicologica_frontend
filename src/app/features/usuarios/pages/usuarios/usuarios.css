@@ -63,4 +63,13 @@
     justify-content: flex-start;
     opacity: 1;
   }
+
+  .users-email {
+    align-items: flex-start;
+  }
+
+  .users-email span {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
