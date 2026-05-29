@@ -7,7 +7,7 @@ export interface iUsuarioAutenticado {
   id: string;
   nome: string;
   email: string;
-  authorities: string[];
+  authorities?: string[];
   ativo: boolean;
 }
 

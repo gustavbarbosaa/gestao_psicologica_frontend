@@ -70,7 +70,7 @@ export class Login implements OnInit {
       error: (err) => {
         this.loading.set(false);
 
-        if (err.status === 403) {
+        if (err.status === 409 && err.error?.message === 'Usuário inativo.') {
           this.usuarioInativo.set(true);
         } else {
           this.credenciaisInvalidas.set(true);
