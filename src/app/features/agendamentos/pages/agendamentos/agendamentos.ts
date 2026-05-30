@@ -236,6 +236,10 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private adicionarEventoUnicoNoCalendario(agendamento: any): void {
+    if (!agendamento.ativo) {
+      return;
+    }
+
     const eventoFormatado = {
       id: agendamento.id,
       title: agendamento.paciente.nome,
@@ -405,11 +409,25 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
         onGerarCobranca: () => {
           return this.gerarCobrancaPagamento(agendamento.id);
         },
+        onInativarAgendamento: () => {
+          return this.inativarAgendamento(agendamento.id);
+        },
       },
       zOkIcon: 'check',
       zCancelIcon: 'x',
       zOkText: 'Salvar',
       zCancelText: 'Cancelar',
+      zAuxIcon: 'trash',
+      zAuxText: 'Inativar',
+      zAuxDestructive: true,
+      zAuxVisible: (instance: EditarAgendamentoForm | null) =>
+        instance?.podeInativarAgendamento ?? false,
+      zAuxDisabled: (instance: EditarAgendamentoForm | null) =>
+        instance?.inativandoAgendamento() ?? false,
+      zOnAux: (instance) => {
+        instance.inativarAgendamento();
+        return false;
+      },
       zOnOk: (instance) => {
         const form = instance.form;
 
@@ -486,9 +504,7 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
       },
       error: (err) => {
         const mensagem =
-          err.error?.erros?.[0] ??
-          err.error?.message ??
-          'Não foi possível criar o agendamento.';
+          err.error?.erros?.[0] ?? err.error?.message ?? 'Não foi possível criar o agendamento.';
         this.toastService.exibirToastErro('Erro ao criar agendamento', mensagem);
         console.error('Erro ao criar agendamento', err);
       },
@@ -552,12 +568,33 @@ export class Agendamentos implements OnInit, OnDestroy, AfterViewInit {
     );
   }
 
+  private inativarAgendamento(agendamentoId: string): Observable<iAgendamentoResponse> {
+    return this.agendamentoService.inativarAgendamento(agendamentoId).pipe(
+      tap((agendamento) => {
+        this.toastService.exibirToastSucesso(
+          'Agendamento inativado',
+          'O agendamento foi removido da lista de ativos.',
+        );
+        this.atualizarEventoNoCalendario(agendamento);
+      }),
+      catchError((err) => {
+        const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Tente novamente.';
+        this.toastService.exibirToastErro('Erro ao inativar agendamento', mensagem);
+        return throwError(() => err);
+      }),
+    );
+  }
+
   private atualizarEventoNoCalendario(agendamento: iAgendamentoResponse): void {
     const api = this.calendarComponent.getApi();
     const existing = api.getEventById(agendamento.id);
 
     if (existing) {
       existing.remove();
+    }
+
+    if (!agendamento.ativo) {
+      return;
     }
 
     api.addEvent({

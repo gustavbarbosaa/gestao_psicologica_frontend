@@ -1,100 +1,201 @@
 <div class="space-y-6 animate-in fade-in duration-500">
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+  <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
     <div>
-      <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Tipos de Atendimento</h1>
-      <p class="text-slate-500 text-sm mt-1">
-        Gerencie os tipos de atendimento disponíveis no sistema.
+      <h1 class="text-2xl font-bold tracking-tight text-slate-800">Tipos de Atendimento</h1>
+      <p class="mt-1 text-sm text-slate-500">
+        Gerencie os tipos de atendimento agrupados por usuário.
       </p>
     </div>
 
     <button
       type="button"
       z-button
-      class="bg-teal-700 hover:bg-teal-800 text-white shadow-sm shadow-teal-900/10 transition-all active:scale-95"
+      class="bg-teal-700 text-white shadow-sm shadow-teal-900/10 transition-all active:scale-95 hover:bg-teal-800"
       (click)="abrirCriar()"
     >
       <div class="flex items-center gap-2">
-        <z-icon zType="plus" class="w-4 h-4" />
+        <z-icon zType="plus" class="h-4 w-4" />
         <span>Novo tipo de atendimento</span>
       </div>
     </button>
   </div>
 
-  <div class="service-types-table-wrapper rounded-xl border border-slate-200 bg-white shadow-sm">
-    <table class="service-types-table w-full border-collapse text-left">
-      <thead class="service-types-table-head">
-        <tr
-          class="bg-slate-50/80 border-b border-slate-100 text-xs uppercase font-semibold text-slate-500 tracking-wider"
-        >
-          <th class="px-6 py-4">Nome</th>
-          <th class="px-6 py-4">Valor padrão</th>
-          <th class="px-6 py-4 text-right">Ações</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-slate-100">
-        @for (tipo of tipos(); track tipo.id) {
-          <tr class="service-types-row hover:bg-slate-50/80 transition-colors group">
-            <td class="service-type-name-cell px-6 py-4" data-label="Nome">
-              <div class="flex items-center gap-3">
-                <div
-                  class="service-type-avatar w-10 h-10 rounded-full bg-slate-50 text-slate-700 border border-slate-100 flex items-center justify-center font-bold text-sm"
-                >
-                  {{ tipo.nome.charAt(0).toUpperCase() }}
-                </div>
-                <div class="min-w-0">
-                  <p
-                    class="truncate font-semibold text-slate-700 group-hover:text-teal-700 transition-colors"
+  @if (usuarioEhAdmin) {
+    <div class="space-y-4">
+      @for (grupo of tiposAgrupados(); track grupo.usuarioId) {
+        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <button
+            type="button"
+            class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-slate-50"
+            (click)="alternarGrupo(grupo.usuarioId)"
+          >
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <h2 class="truncate text-base font-semibold text-slate-800">
+                  {{ grupo.nomeUsuario }}
+                </h2>
+                @if (grupo.usuarioAtual) {
+                  <span
+                    class="rounded-full border border-teal-200 bg-teal-50 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-teal-700"
                   >
-                    {{ tipo.nome }}
+                    Você
+                  </span>
+                }
+              </div>
+              <p class="mt-1 text-sm text-slate-500">
+                {{ grupo.tipos.length }}
+                {{ grupo.tipos.length === 1 ? 'tipo cadastrado' : 'tipos cadastrados' }}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-medium text-slate-400">
+                {{ grupoAberto(grupo.usuarioId) ? 'Ocultar' : 'Mostrar' }}
+              </span>
+              <z-icon
+                zType="chevron-down"
+                class="h-4 w-4 text-slate-400 transition-transform"
+                [class.rotate-180]="grupoAberto(grupo.usuarioId)"
+              />
+            </div>
+          </button>
+
+          @if (grupoAberto(grupo.usuarioId)) {
+            <div class="border-t border-slate-100 px-4 py-3 sm:px-5">
+              <div class="space-y-3">
+                @for (tipo of grupo.tipos; track tipo.id) {
+                  <article
+                    class="flex flex-col gap-4 rounded-xl border border-slate-100 bg-slate-50/70 px-4 py-4 transition-colors hover:border-teal-100 hover:bg-teal-50/40 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div class="flex min-w-0 items-center gap-3">
+                      <div
+                        class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700"
+                      >
+                        {{ tipo.nome.charAt(0).toUpperCase() }}
+                      </div>
+
+                      <div class="min-w-0">
+                        <p class="truncate font-semibold text-slate-700">
+                          {{ tipo.nome }}
+                        </p>
+                        <p class="text-sm text-slate-500">
+                          R$ {{ tipo.valorPadraoTipoAtendimento | number: '1.2-2' }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-teal-50 hover:text-teal-600"
+                        title="Editar"
+                        (click)="editarTipo(tipo)"
+                      >
+                        <z-icon zType="settings" class="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                        title="Excluir"
+                        (click)="deletarTipo(tipo.id)"
+                      >
+                        <z-icon zType="trash" class="h-4 w-4" />
+                      </button>
+                    </div>
+                  </article>
+                }
+              </div>
+            </div>
+          }
+        </section>
+      } @empty {
+        <div class="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
+          <div class="flex flex-col items-center justify-center gap-3">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50">
+              <z-icon zType="tag" class="h-6 w-6 text-slate-300" />
+            </div>
+            <p class="font-medium text-slate-500">Nenhum tipo de atendimento cadastrado ainda.</p>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="service-types-table-wrapper rounded-xl border border-slate-200 bg-white shadow-sm">
+      <table class="service-types-table w-full border-collapse text-left">
+        <thead class="service-types-table-head">
+          <tr
+            class="border-b border-slate-100 bg-slate-50/80 text-xs font-semibold uppercase tracking-wider text-slate-500"
+          >
+            <th class="px-6 py-4">Nome</th>
+            <th class="px-6 py-4">Valor padrão</th>
+            <th class="px-6 py-4 text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (tipo of tipos(); track tipo.id) {
+            <tr class="service-types-row group transition-colors hover:bg-slate-50/80">
+              <td class="service-type-name-cell px-6 py-4" data-label="Nome">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="service-type-avatar flex h-10 w-10 items-center justify-center rounded-full border border-slate-100 bg-slate-50 text-sm font-bold text-slate-700"
+                  >
+                    {{ tipo.nome.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="min-w-0">
+                    <p
+                      class="truncate font-semibold text-slate-700 transition-colors group-hover:text-teal-700"
+                    >
+                      {{ tipo.nome }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <td class="service-type-price-cell px-6 py-4" data-label="Valor padrão">
+                <div class="service-type-price text-slate-700">
+                  R$ {{ tipo.valorPadraoTipoAtendimento | number: '1.2-2' }}
+                </div>
+              </td>
+
+              <td class="service-types-actions-cell px-6 py-4 text-right" data-label="Ações">
+                <div
+                  class="service-types-actions flex items-center justify-end gap-1 opacity-50 transition-all duration-200 group-hover:opacity-100"
+                >
+                  <button
+                    type="button"
+                    class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-teal-50 hover:text-teal-600"
+                    title="Editar"
+                    (click)="editarTipo(tipo)"
+                  >
+                    <z-icon zType="settings" class="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                    title="Excluir"
+                    (click)="deletarTipo(tipo.id)"
+                  >
+                    <z-icon zType="trash" class="h-4 w-4" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3" class="px-6 py-16 text-center">
+                <div class="flex flex-col items-center justify-center gap-3">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50">
+                    <z-icon zType="tag" class="h-6 w-6 text-slate-300" />
+                  </div>
+                  <p class="font-medium text-slate-500">
+                    Nenhum tipo de atendimento cadastrado ainda.
                   </p>
                 </div>
-              </div>
-            </td>
-
-            <td class="service-type-price-cell px-6 py-4" data-label="Valor padrão">
-              <div class="service-type-price text-slate-700">
-                R$ {{ tipo.valorPadraoTipoAtendimento | number: '1.2-2' }}
-              </div>
-            </td>
-
-            <td class="service-types-actions-cell px-6 py-4 text-right" data-label="Ações">
-              <div
-                class="service-types-actions flex items-center justify-end gap-1 opacity-50 transition-all duration-200 group-hover:opacity-100"
-              >
-                <button
-                  type="button"
-                  class="p-2 rounded-lg text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"
-                  title="Editar"
-                  (click)="editarTipo(tipo)"
-                >
-                  <z-icon zType="settings" class="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  class="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors"
-                  title="Excluir"
-                  (click)="deletarTipo(tipo.id)"
-                >
-                  <z-icon zType="trash" class="w-4 h-4" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="3" class="px-6 py-16 text-center">
-              <div class="flex flex-col items-center justify-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center">
-                  <z-icon zType="tag" class="w-6 h-6 text-slate-300" />
-                </div>
-                <p class="text-slate-500 font-medium">
-                  Nenhum tipo de atendimento cadastrado ainda.
-                </p>
-              </div>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 </div>

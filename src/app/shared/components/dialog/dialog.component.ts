@@ -35,7 +35,13 @@ import type { ZardIcon } from 'src/app/shared/components/icon/icons';
 // Used by the NgModule provider definition
 
 export type OnClickCallback<T> = (instance: T) => false | void | object;
+export type DialogStateResolver<T> = boolean | ((instance: T | null) => boolean);
 export class ZardDialogOptions<T, U> {
+  zAuxDestructive?: boolean;
+  zAuxDisabled?: DialogStateResolver<T>;
+  zAuxIcon?: ZardIcon;
+  zAuxText?: string | null;
+  zAuxVisible?: DialogStateResolver<T>;
   zCancelIcon?: ZardIcon;
   zCancelText?: string | null;
   zClosable?: boolean;
@@ -49,6 +55,7 @@ export class ZardDialogOptions<T, U> {
   zOkDisabled?: boolean;
   zOkIcon?: ZardIcon;
   zOkText?: string | null;
+  zOnAux?: EventEmitter<T> | OnClickCallback<T> = noopFn;
   zOnCancel?: EventEmitter<T> | OnClickCallback<T> = noopFn;
   zOnOk?: EventEmitter<T> | OnClickCallback<T> = noopFn;
   zTitle?: string | TemplateRef<T>;
@@ -101,7 +108,9 @@ export class ZardDialogOptions<T, U> {
     </main>
 
     @if (!config.zHideFooter) {
-      <footer class="shrink-0 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
+      <footer
+        class="shrink-0 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
+      >
         @if (config.zCancelText !== null) {
           <button
             type="button"
@@ -115,6 +124,23 @@ export class ZardDialogOptions<T, U> {
             }
 
             {{ config.zCancelText ?? 'Cancel' }}
+          </button>
+        }
+
+        @if (config.zAuxText !== null && config.zAuxText !== undefined && isAuxVisible()) {
+          <button
+            type="button"
+            data-testid="z-aux-button"
+            z-button
+            [zType]="config.zAuxDestructive ? 'destructive' : 'outline'"
+            [disabled]="isAuxDisabled()"
+            (click)="onAuxClick()"
+          >
+            @if (config.zAuxIcon) {
+              <z-icon [zType]="config.zAuxIcon" />
+            }
+
+            {{ config.zAuxText ? config.zAuxText : 'Ação' }}
           </button>
         }
 
@@ -184,6 +210,7 @@ export class ZardDialogComponent<T, U> extends BasePortalOutlet {
   readonly portalOutlet = viewChild.required(CdkPortalOutlet);
 
   okTriggered = output<void>();
+  auxTriggered = output<void>();
   cancelTriggered = output<void>();
 
   constructor() {
@@ -213,8 +240,31 @@ export class ZardDialogComponent<T, U> extends BasePortalOutlet {
     this.okTriggered.emit();
   }
 
+  onAuxClick() {
+    this.auxTriggered.emit();
+  }
+
   onCloseClick() {
     this.cancelTriggered.emit();
+  }
+
+  protected isAuxVisible(): boolean {
+    return this.resolveState(this.config.zAuxVisible, true);
+  }
+
+  protected isAuxDisabled(): boolean {
+    return this.resolveState(this.config.zAuxDisabled, false);
+  }
+
+  private resolveState(
+    value: DialogStateResolver<T> | undefined,
+    fallback: boolean,
+  ): boolean {
+    if (typeof value === 'function') {
+      return value(this.dialogRef?.componentInstance ?? null);
+    }
+
+    return value ?? fallback;
   }
 }
 

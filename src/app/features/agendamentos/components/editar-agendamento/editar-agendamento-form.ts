@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal, ViewContainerRef } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ZardIconComponent } from '@shared/components/icon';
 import { ZardSelectItemComponent } from '@shared/components/select/select-item.component';
@@ -11,7 +11,8 @@ import {
   StatusPagamento,
 } from '@shared/models/agendamento.model';
 import { iPacienteMaxResponse } from '@shared/models/paciente.model';
-import { Z_MODAL_DATA } from '@shared/components/dialog/dialog.service';
+import { Z_MODAL_DATA, ZardDialogService } from '@shared/components/dialog/dialog.service';
+import { ZardDialogRef } from '@shared/components/dialog/dialog-ref';
 import { LoginService } from '@core/services/login-service';
 import { PacienteService } from '@core/services/paciente-service';
 import { TipoAtendimentoService } from '@core/services/tipo-atendimento';
@@ -39,6 +40,7 @@ type EditarAgendamentoModalData = {
   onChangeStatusAtendimento?: (status: StatusAtendimento) => Observable<iAgendamentoResponse>;
   onConfirmarPagamento?: () => Observable<iAgendamentoResponse>;
   onGerarCobranca?: () => Observable<iAgendamentoResponse>;
+  onInativarAgendamento?: () => Observable<iAgendamentoResponse>;
 };
 
 @Component({
@@ -59,6 +61,9 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   private readonly pacienteService = inject(PacienteService);
   private readonly tipoAtendimentoService = inject(TipoAtendimentoService);
   private readonly toastService = inject(ToastService);
+  private readonly dialogService = inject(ZardDialogService);
+  private readonly dialogRef = inject<ZardDialogRef<EditarAgendamentoForm>>(ZardDialogRef as any);
+  private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly modalData = inject(Z_MODAL_DATA) as EditarAgendamentoModalData | undefined;
 
   public dadosCarregados = signal<boolean>(false);
@@ -68,6 +73,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   public buscaPaciente = signal<string>('');
   public pacienteDropdownAberto = signal<boolean>(false);
   public carregandoPacientes = signal<boolean>(false);
+  public inativandoAgendamento = signal<boolean>(false);
   public horaAtual = signal<Date>(new Date());
   public pacienteSelecionado = computed(() => {
     const pacienteId = this.form.controls.pacienteId.value || this.agendamento()?.paciente.id;
@@ -256,9 +262,11 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   }
 
   carregarTiposAtendimentos() {
+    const usuarioId = this.getUsuarioId();
+
     this.tipoAtendimentoService.buscarTiposAtendimentos().subscribe({
       next: (dados) => {
-        this.tipoAtendimentos.set(dados);
+        this.tipoAtendimentos.set(dados.filter((tipo) => tipo.usuarioId === usuarioId));
         this.dadosCarregados.set(true);
       },
       error: (err) => {
@@ -319,6 +327,10 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
 
   get podeEnviarMensagemCobranca(): boolean {
     return this.statusPagamento === 'COBRANCA_GERADA';
+  }
+
+  get podeInativarAgendamento(): boolean {
+    return this.statusAtendimento === 'CRIADO' && this.statusPagamento !== 'CONFIRMADO';
   }
 
   alterarStatusAtendimento(status: StatusAtendimento): void {
@@ -424,6 +436,61 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     if (url) {
       window.open(url, '_blank');
     }
+  }
+
+  inativarAgendamento(): void {
+    const agendamento = this.agendamento();
+
+    if (!agendamento) {
+      return;
+    }
+
+    const dataHoraInicio = this.getDataHoraInicioSelecionada();
+    const data = dataHoraInicio ? new Intl.DateTimeFormat('pt-BR').format(dataHoraInicio) : '';
+    const hora = dataHoraInicio
+      ? new Intl.DateTimeFormat('pt-BR', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }).format(dataHoraInicio)
+      : '';
+    const tipoAtendimento = agendamento.tipoAtendimento?.nome ?? 'atendimento';
+    const nomePaciente = agendamento.paciente?.nome ?? 'paciente';
+
+    this.dialogService.create({
+      zTitle: 'Confirmar inativação',
+      zContent: `Deseja remover o agendamento "${tipoAtendimento}" de ${nomePaciente} no dia ${data} às ${hora}?`,
+      zViewContainerRef: this.viewContainerRef,
+      zOkText: 'Inativar',
+      zCancelText: 'Cancelar',
+      zOkDestructive: true,
+      zOnOk: () => {
+        this.confirmarInativacaoAgendamento();
+      },
+    });
+  }
+
+  private confirmarInativacaoAgendamento(): void {
+    if (this.inativandoAgendamento()) {
+      return;
+    }
+
+    const request = this.modalData?.onInativarAgendamento?.();
+
+    if (!request) {
+      return;
+    }
+
+    this.inativandoAgendamento.set(true);
+
+    request.pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.inativandoAgendamento.set(false);
+        this.dialogRef.close(true);
+      },
+      error: () => {
+        this.inativandoAgendamento.set(false);
+      },
+    });
   }
 
   private criarUrlMensagemCobranca(): string | null | void {

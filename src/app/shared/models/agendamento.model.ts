@@ -23,6 +23,7 @@ export interface iAgendamentoResponse {
   usuario: iLoginResponse;
   tipoAtendimento: iTipoAtendimento;
   valorAtendimento: number;
+  ativo: boolean;
 }
 
 export interface iAgendamentoRequest {

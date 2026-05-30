@@ -7,6 +7,7 @@ import { filter, fromEvent, Subject, takeUntil } from 'rxjs';
 import type { ZardDialogComponent, ZardDialogOptions } from './dialog.component';
 
 const enum eTriggerAction {
+  AUX = 'aux',
   CANCEL = 'cancel',
   OK = 'ok',
 }
@@ -23,6 +24,7 @@ export class ZardDialogRef<T = any, R = any, U = any> {
     private containerInstance: ZardDialogComponent<T, U>,
     @Inject(PLATFORM_ID) private platformId: object,
   ) {
+    this.containerInstance.auxTriggered.subscribe(() => this.trigger(eTriggerAction.AUX));
     this.containerInstance.cancelTriggered.subscribe(() => this.trigger(eTriggerAction.CANCEL));
     this.containerInstance.okTriggered.subscribe(() => this.trigger(eTriggerAction.OK));
 
@@ -72,7 +74,11 @@ export class ZardDialogRef<T = any, R = any, U = any> {
   }
 
   private trigger(action: eTriggerAction) {
-    const trigger = { ok: this.config.zOnOk, cancel: this.config.zOnCancel }[action];
+    const trigger = {
+      aux: this.config.zOnAux,
+      ok: this.config.zOnOk,
+      cancel: this.config.zOnCancel,
+    }[action];
 
     if (trigger instanceof EventEmitter) {
       trigger.emit(this.getContentComponent());

@@ -177,9 +177,11 @@ export class CriaAgendamentoForm implements OnInit, OnDestroy {
   }
 
   carregarTiposAtendimentos() {
+    const usuarioId = this.getUsuarioId();
+
     this.tipoAtendimentoService.buscarTiposAtendimentos().subscribe({
       next: (dados) => {
-        this.tiposAtendimentos.set(dados);
+        this.tiposAtendimentos.set(dados.filter((tipo) => tipo.usuarioId === usuarioId));
         this.dadosCarregados.set(true);
       },
       error: (err) => {

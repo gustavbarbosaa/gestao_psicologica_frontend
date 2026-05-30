@@ -4,6 +4,7 @@ export interface iTipoAtendimento {
   id: string;
   nome: string;
   valorPadraoTipoAtendimento: number;
+  usuarioId: string;
 }
 
 export interface iTipoAtendimentoRequest {

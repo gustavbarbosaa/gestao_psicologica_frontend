@@ -7,7 +7,7 @@ import {
   StatusAtendimento,
   StatusPagamento,
 } from '@shared/models/agendamento.model';
-import { Observable, Subject, tap } from 'rxjs';
+import { map, Observable, Subject, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -24,19 +24,21 @@ export class AgendamentoService {
   public agendamentoCriado$ = this.agendamentoCriadoSource.asObservable();
 
   public buscarTodosAgendamentos(): Observable<iAgendamentoResponse[]> {
-    return this.httpClient.get<iAgendamentoResponse[]>(`${this.API_URL}${this.AGENDAMENTOS_PATH}`);
+    return this.httpClient
+      .get<iAgendamentoResponse[]>(`${this.API_URL}${this.AGENDAMENTOS_PATH}`)
+      .pipe(map((agendamentos) => this.filtrarAgendamentosAtivos(agendamentos)));
   }
 
   public buscarAgendamentosPorUsuario(): Observable<iAgendamentoResponse[]> {
-    return this.httpClient.get<iAgendamentoResponse[]>(
-      `${this.API_URL}${this.AGENDAMENTOS_POR_USUARIO_PATH}`,
-    );
+    return this.httpClient
+      .get<iAgendamentoResponse[]>(`${this.API_URL}${this.AGENDAMENTOS_POR_USUARIO_PATH}`)
+      .pipe(map((agendamentos) => this.filtrarAgendamentosAtivos(agendamentos)));
   }
 
   public buscarAgendamentosPorPaciente(pacienteId: string): Observable<iAgendamentoResponse[]> {
-    return this.httpClient.get<iAgendamentoResponse[]>(
-      `${this.API_URL}${this.AGENDAMENTOS_POR_PACIENTE_PATH}${pacienteId}`,
-    );
+    return this.httpClient
+      .get<iAgendamentoResponse[]>(`${this.API_URL}${this.AGENDAMENTOS_POR_PACIENTE_PATH}${pacienteId}`)
+      .pipe(map((agendamentos) => this.filtrarAgendamentosAtivos(agendamentos)));
   }
 
   public editarAgendamento(
@@ -73,5 +75,18 @@ export class AgendamentoService {
       `${this.API_URL}${this.AGENDAMENTOS_PATH}/${agendamentoId}/status`,
       { statusAtendimento },
     );
+  }
+
+  public inativarAgendamento(agendamentoId: string): Observable<iAgendamentoResponse> {
+    return this.httpClient.patch<iAgendamentoResponse>(
+      `${this.API_URL}${this.AGENDAMENTOS_PATH}/${agendamentoId}/inativar`,
+      {},
+    );
+  }
+
+  private filtrarAgendamentosAtivos(
+    agendamentos: iAgendamentoResponse[],
+  ): iAgendamentoResponse[] {
+    return agendamentos.filter((agendamento) => agendamento.ativo);
   }
 }
