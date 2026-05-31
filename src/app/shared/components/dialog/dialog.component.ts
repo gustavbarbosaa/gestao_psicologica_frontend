@@ -109,56 +109,100 @@ export class ZardDialogOptions<T, U> {
 
     @if (!config.zHideFooter) {
       <footer
-        class="shrink-0 flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2"
+        class="shrink-0 border-t border-slate-100 pt-4"
       >
-        @if (config.zCancelText !== null) {
-          <button
-            type="button"
-            data-testid="z-cancel-button"
-            z-button
-            zType="outline"
-            (click)="onCloseClick()"
-          >
-            @if (config.zCancelIcon) {
-              <z-icon [zType]="config.zCancelIcon" />
-            }
-
-            {{ config.zCancelText ?? 'Cancel' }}
-          </button>
-        }
-
         @if (config.zAuxText !== null && config.zAuxText !== undefined && isAuxVisible()) {
-          <button
-            type="button"
-            data-testid="z-aux-button"
-            z-button
-            [zType]="config.zAuxDestructive ? 'destructive' : 'outline'"
-            [disabled]="isAuxDisabled()"
-            (click)="onAuxClick()"
-          >
-            @if (config.zAuxIcon) {
-              <z-icon [zType]="config.zAuxIcon" />
+          <div class="flex flex-col gap-2 sm:flex-row sm:justify-end sm:space-x-2">
+            @if (config.zOkText !== null) {
+              <div class="order-1 sm:order-3">
+                <button
+                  type="button"
+                  data-testid="z-ok-button"
+                  z-button
+                  [zType]="config.zOkDestructive ? 'destructive' : 'default'"
+                  [disabled]="config.zOkDisabled"
+                  class="w-full shadow-sm sm:min-w-40"
+                  (click)="onOkClick()"
+                >
+                  @if (config.zOkIcon) {
+                    <z-icon [zType]="config.zOkIcon" />
+                  }
+
+                  {{ config.zOkText ?? 'OK' }}
+                </button>
+              </div>
             }
 
-            {{ config.zAuxText ? config.zAuxText : 'Ação' }}
-          </button>
-        }
+            <div class="order-2 grid grid-cols-2 gap-2 sm:order-2 sm:w-auto">
+              @if (config.zCancelText !== null) {
+                <button
+                  type="button"
+                  data-testid="z-cancel-button"
+                  z-button
+                  zType="outline"
+                  class="w-full"
+                  (click)="onCloseClick()"
+                >
+                  @if (config.zCancelIcon) {
+                    <z-icon [zType]="config.zCancelIcon" />
+                  }
 
-        @if (config.zOkText !== null) {
-          <button
-            type="button"
-            data-testid="z-ok-button"
-            z-button
-            [zType]="config.zOkDestructive ? 'destructive' : 'default'"
-            [disabled]="config.zOkDisabled"
-            (click)="onOkClick()"
-          >
-            @if (config.zOkIcon) {
-              <z-icon [zType]="config.zOkIcon" />
+                  {{ config.zCancelText ?? 'Cancel' }}
+                </button>
+              }
+
+              <button
+                type="button"
+                data-testid="z-aux-button"
+                z-button
+                [zType]="config.zAuxDestructive ? 'destructive' : 'outline'"
+                [disabled]="isAuxDisabled()"
+                class="w-full"
+                (click)="onAuxClick()"
+              >
+                @if (config.zAuxIcon) {
+                  <z-icon [zType]="config.zAuxIcon" />
+                }
+
+                {{ config.zAuxText ? config.zAuxText : 'Ação' }}
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:space-x-2">
+            @if (config.zCancelText !== null) {
+              <button
+                type="button"
+                data-testid="z-cancel-button"
+                z-button
+                zType="outline"
+                (click)="onCloseClick()"
+              >
+                @if (config.zCancelIcon) {
+                  <z-icon [zType]="config.zCancelIcon" />
+                }
+
+                {{ config.zCancelText ?? 'Cancel' }}
+              </button>
             }
 
-            {{ config.zOkText ?? 'OK' }}
-          </button>
+            @if (config.zOkText !== null) {
+              <button
+                type="button"
+                data-testid="z-ok-button"
+                z-button
+                [zType]="config.zOkDestructive ? 'destructive' : 'default'"
+                [disabled]="config.zOkDisabled"
+                (click)="onOkClick()"
+              >
+                @if (config.zOkIcon) {
+                  <z-icon [zType]="config.zOkIcon" />
+                }
+
+                {{ config.zOkText ?? 'OK' }}
+              </button>
+            }
+          </div>
         }
       </footer>
     }
