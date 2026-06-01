@@ -394,7 +394,11 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
       next: (agendamento) => {
         this.agendamento.set(agendamento);
 
-        this.abrirWhatsapp(destinoWhatsapp.telefone, destinoWhatsapp.mensagem, abaWhatsapp ?? undefined);
+        this.abrirWhatsapp(
+          destinoWhatsapp.telefone,
+          destinoWhatsapp.mensagem,
+          abaWhatsapp ?? undefined,
+        );
       },
       error: () => {
         abaWhatsapp?.close();
@@ -564,6 +568,8 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
 
   private criarUrlWhatsappWeb(telefone: string, mensagem: string): string {
     const texto = encodeURIComponent(mensagem);
+
+    alert(this.isDispositivoMovel() + ' - ' + navigator.userAgent);
 
     return this.isDispositivoMovel()
       ? `https://wa.me/${telefone}?text=${texto}`

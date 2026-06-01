@@ -378,6 +378,8 @@ export class Financeiro implements OnInit {
   private criarUrlWhatsappWeb(telefone: string, mensagem: string): string {
     const texto = encodeURIComponent(mensagem);
 
+    alert(this.isDispositivoMovel() + ' - ' + navigator.userAgent);
+
     return this.isDispositivoMovel()
       ? `https://wa.me/${telefone}?text=${texto}`
       : `https://web.whatsapp.com/send?phone=${telefone}&text=${texto}`;
