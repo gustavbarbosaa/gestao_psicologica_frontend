@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnDestroy, OnInit, signal, ViewContainerRef } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewContainerRef,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ZardIconComponent } from '@shared/components/icon';
 import { ZardSelectItemComponent } from '@shared/components/select/select-item.component';
@@ -425,7 +433,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     }
 
     const mensagem = this.criarMensagemConfirmacao(paciente.nome, dataHoraInicio);
-    const url = `https://web.whatsapp.com/send?phone=${telefone}&text=${encodeURIComponent(mensagem)}`;
+    const url = this.criarUrlWhatsapp(telefone, mensagem);
 
     window.open(url, '_blank', 'noopener,noreferrer');
   }
@@ -529,9 +537,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     }
 
     const mensagem = this.criarMensagemCobranca(paciente.nome, dataHoraInicio, valorAtendimento);
-    const url = `https://web.whatsapp.com/send?phone=${telefone}&text=${encodeURIComponent(mensagem)}`;
-
-    return url;
+    return this.criarUrlWhatsapp(telefone, mensagem);
   }
 
   private getPacienteSelecionado(): iPacienteMaxResponse | undefined {
@@ -560,6 +566,18 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     }
 
     return apenasNumeros.startsWith('55') ? apenasNumeros : `55${apenasNumeros}`;
+  }
+
+  private criarUrlWhatsapp(telefone: string, mensagem: string): string {
+    const texto = encodeURIComponent(mensagem);
+
+    return this.isDispositivoMovel()
+      ? `https://wa.me/${telefone}?text=${texto}`
+      : `https://web.whatsapp.com/send?phone=${telefone}&text=${texto}`;
+  }
+
+  private isDispositivoMovel(): boolean {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || navigator.userAgent.includes('Mobile');
   }
 
   private criarMensagemConfirmacao(nomePaciente: string, dataHoraInicio: Date): string {

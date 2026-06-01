@@ -362,8 +362,7 @@ export class Financeiro implements OnInit {
     }
 
     const mensagem = this.criarMensagemCobranca(paciente.nome, dataHoraInicio, valorAtendimento);
-
-    return `https://web.whatsapp.com/send?phone=${telefone}&text=${encodeURIComponent(mensagem)}`;
+    return this.criarUrlWhatsapp(telefone, mensagem);
   }
 
   private formatarTelefoneParaWhatsapp(telefone?: string): string | null {
@@ -374,6 +373,18 @@ export class Financeiro implements OnInit {
     }
 
     return apenasNumeros.startsWith('55') ? apenasNumeros : `55${apenasNumeros}`;
+  }
+
+  private criarUrlWhatsapp(telefone: string, mensagem: string): string {
+    const texto = encodeURIComponent(mensagem);
+
+    return this.isDispositivoMovel()
+      ? `https://wa.me/${telefone}?text=${texto}`
+      : `https://web.whatsapp.com/send?phone=${telefone}&text=${texto}`;
+  }
+
+  private isDispositivoMovel(): boolean {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || navigator.userAgent.includes('Mobile');
   }
 
   private criarMensagemCobranca(
