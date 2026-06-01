@@ -376,9 +376,9 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   }
 
   gerarCobranca(): void {
-    const urlWhatsapp = this.criarUrlMensagemCobranca();
+    const destinoWhatsapp = this.criarDestinoWhatsappCobranca();
 
-    if (!urlWhatsapp) {
+    if (!destinoWhatsapp) {
       return;
     }
 
@@ -394,11 +394,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
       next: (agendamento) => {
         this.agendamento.set(agendamento);
 
-        if (abaWhatsapp) {
-          abaWhatsapp.location.href = urlWhatsapp;
-        } else {
-          window.open(urlWhatsapp, '_blank');
-        }
+        this.abrirWhatsapp(destinoWhatsapp.telefone, destinoWhatsapp.mensagem, abaWhatsapp ?? undefined);
       },
       error: () => {
         abaWhatsapp?.close();
@@ -433,16 +429,14 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     }
 
     const mensagem = this.criarMensagemConfirmacao(paciente.nome, dataHoraInicio);
-    const url = this.criarUrlWhatsapp(telefone, mensagem);
-
-    window.open(url, '_blank', 'noopener,noreferrer');
+    this.abrirWhatsapp(telefone, mensagem);
   }
 
   enviarMensagemCobranca(): void {
-    const url = this.criarUrlMensagemCobranca();
+    const destino = this.criarDestinoWhatsappCobranca();
 
-    if (url) {
-      window.open(url, '_blank');
+    if (destino) {
+      this.abrirWhatsapp(destino.telefone, destino.mensagem);
     }
   }
 
@@ -501,7 +495,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     });
   }
 
-  private criarUrlMensagemCobranca(): string | null | void {
+  private criarDestinoWhatsappCobranca(): { telefone: string; mensagem: string } | null | void {
     const paciente = this.getPacienteSelecionado();
     const telefone = this.formatarTelefoneParaWhatsapp(paciente?.telefone);
     const dataHoraInicio = this.getDataHoraInicioSelecionada();
@@ -537,7 +531,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     }
 
     const mensagem = this.criarMensagemCobranca(paciente.nome, dataHoraInicio, valorAtendimento);
-    return this.criarUrlWhatsapp(telefone, mensagem);
+    return { telefone, mensagem };
   }
 
   private getPacienteSelecionado(): iPacienteMaxResponse | undefined {
@@ -568,7 +562,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     return apenasNumeros.startsWith('55') ? apenasNumeros : `55${apenasNumeros}`;
   }
 
-  private criarUrlWhatsapp(telefone: string, mensagem: string): string {
+  private criarUrlWhatsappWeb(telefone: string, mensagem: string): string {
     const texto = encodeURIComponent(mensagem);
 
     return this.isDispositivoMovel()
@@ -576,8 +570,49 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
       : `https://web.whatsapp.com/send?phone=${telefone}&text=${texto}`;
   }
 
+  private criarUrlWhatsappApp(telefone: string, mensagem: string): string {
+    return `whatsapp://send?phone=${telefone}&text=${encodeURIComponent(mensagem)}`;
+  }
+
   private isDispositivoMovel(): boolean {
-    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || navigator.userAgent.includes('Mobile');
+    return (
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      navigator.userAgent.includes('Mobile')
+    );
+  }
+
+  private abrirWhatsapp(telefone: string, mensagem: string, destino?: Window): void {
+    const urlWeb = this.criarUrlWhatsappWeb(telefone, mensagem);
+
+    if (!this.isDispositivoMovel()) {
+      if (destino) {
+        destino.location.href = urlWeb;
+      } else {
+        window.open(urlWeb, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
+
+    const urlApp = this.criarUrlWhatsappApp(telefone, mensagem);
+
+    if (destino) {
+      destino.location.href = urlApp;
+      globalThis.setTimeout(() => {
+        try {
+          if (!destino.closed) {
+            destino.location.href = urlWeb;
+          }
+        } catch {
+          window.open(urlWeb, '_blank', 'noopener,noreferrer');
+        }
+      }, 900);
+      return;
+    }
+
+    window.location.href = urlApp;
+    globalThis.setTimeout(() => {
+      window.open(urlWeb, '_blank', 'noopener,noreferrer');
+    }, 900);
   }
 
   private criarMensagemConfirmacao(nomePaciente: string, dataHoraInicio: Date): string {

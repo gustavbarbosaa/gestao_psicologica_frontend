@@ -148,9 +148,9 @@ export class Financeiro implements OnInit {
 
     this.pacienteService.buscarPacientePorIdDetalhado(agendamento.paciente.id).subscribe({
       next: (paciente) => {
-        const urlWhatsapp = this.criarUrlMensagemCobranca(agendamento, paciente);
+        const destinoWhatsapp = this.criarDestinoWhatsappCobranca(agendamento, paciente);
 
-        if (!urlWhatsapp) {
+        if (!destinoWhatsapp) {
           abaWhatsapp?.close();
           this.atualizandoPagamentoId.set(null);
           return;
@@ -169,11 +169,11 @@ export class Financeiro implements OnInit {
               'A mensagem de cobrança foi preparada para envio.',
             );
 
-            if (abaWhatsapp) {
-              abaWhatsapp.location.href = urlWhatsapp;
-            } else {
-              window.open(urlWhatsapp, '_blank');
-            }
+            this.abrirWhatsapp(
+              destinoWhatsapp.telefone,
+              destinoWhatsapp.mensagem,
+              abaWhatsapp ?? undefined,
+            );
           },
           error: (err) => {
             const mensagem = err.error?.erros?.[0] ?? err.error?.message ?? 'Tente novamente.';
@@ -329,10 +329,10 @@ export class Financeiro implements OnInit {
     return agendamentos.reduce((total, item) => total + this.valorAgendamento(item), 0);
   }
 
-  private criarUrlMensagemCobranca(
+  private criarDestinoWhatsappCobranca(
     agendamento: iAgendamentoResponse,
     paciente: iPacienteMaxResponse,
-  ): string | null {
+  ): { telefone: string; mensagem: string } | null {
     const telefone = this.formatarTelefoneParaWhatsapp(paciente.telefone);
     const dataHoraInicio = parseISO(agendamento.dataHoraInicio);
     const valorAtendimento = this.valorAgendamento(agendamento);
@@ -362,7 +362,7 @@ export class Financeiro implements OnInit {
     }
 
     const mensagem = this.criarMensagemCobranca(paciente.nome, dataHoraInicio, valorAtendimento);
-    return this.criarUrlWhatsapp(telefone, mensagem);
+    return { telefone, mensagem };
   }
 
   private formatarTelefoneParaWhatsapp(telefone?: string): string | null {
@@ -375,7 +375,7 @@ export class Financeiro implements OnInit {
     return apenasNumeros.startsWith('55') ? apenasNumeros : `55${apenasNumeros}`;
   }
 
-  private criarUrlWhatsapp(telefone: string, mensagem: string): string {
+  private criarUrlWhatsappWeb(telefone: string, mensagem: string): string {
     const texto = encodeURIComponent(mensagem);
 
     return this.isDispositivoMovel()
@@ -383,8 +383,49 @@ export class Financeiro implements OnInit {
       : `https://web.whatsapp.com/send?phone=${telefone}&text=${texto}`;
   }
 
+  private criarUrlWhatsappApp(telefone: string, mensagem: string): string {
+    return `whatsapp://send?phone=${telefone}&text=${encodeURIComponent(mensagem)}`;
+  }
+
   private isDispositivoMovel(): boolean {
-    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || navigator.userAgent.includes('Mobile');
+    return (
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+      navigator.userAgent.includes('Mobile')
+    );
+  }
+
+  private abrirWhatsapp(telefone: string, mensagem: string, destino?: Window): void {
+    const urlWeb = this.criarUrlWhatsappWeb(telefone, mensagem);
+
+    if (!this.isDispositivoMovel()) {
+      if (destino) {
+        destino.location.href = urlWeb;
+      } else {
+        window.open(urlWeb, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
+
+    const urlApp = this.criarUrlWhatsappApp(telefone, mensagem);
+
+    if (destino) {
+      destino.location.href = urlApp;
+      globalThis.setTimeout(() => {
+        try {
+          if (!destino.closed) {
+            destino.location.href = urlWeb;
+          }
+        } catch {
+          window.open(urlWeb, '_blank', 'noopener,noreferrer');
+        }
+      }, 900);
+      return;
+    }
+
+    window.location.href = urlApp;
+    globalThis.setTimeout(() => {
+      window.open(urlWeb, '_blank', 'noopener,noreferrer');
+    }, 900);
   }
 
   private criarMensagemCobranca(
