@@ -38,6 +38,7 @@ import {
   takeUntil,
 } from 'rxjs';
 import { Router } from '@angular/router';
+import { WhatsappService } from '@shared/services/whatsapp-service';
 
 type EditarAgendamentoModalData = {
   dataHoraInicio?: string | Date;
@@ -75,6 +76,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly modalData = inject(Z_MODAL_DATA) as EditarAgendamentoModalData | undefined;
   private readonly router = inject(Router);
+  private readonly whatsappService = inject(WhatsappService);
 
   public dadosCarregados = signal<boolean>(false);
   public pacientes = signal<iPacienteMaxResponse[]>([]);
@@ -411,7 +413,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
 
   enviarMensagemConfirmacao(): void {
     const paciente = this.getPacienteSelecionado();
-    const telefone = this.formatarTelefoneParaWhatsapp(paciente?.telefone);
+    const telefone = this.whatsappService.formatarTelefone(paciente?.telefone);
     const dataHoraInicio = this.getDataHoraInicioSelecionada();
 
     if (!paciente) {
@@ -520,7 +522,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
 
   private criarDestinoWhatsappCobranca(): { telefone: string; mensagem: string } | null | void {
     const paciente = this.getPacienteSelecionado();
-    const telefone = this.formatarTelefoneParaWhatsapp(paciente?.telefone);
+    const telefone = this.whatsappService.formatarTelefone(paciente?.telefone);
     const dataHoraInicio = this.getDataHoraInicioSelecionada();
     const valorAtendimento = this.getValorAtendimentoSelecionado();
 
@@ -575,67 +577,8 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     return Number.isNaN(data.getTime()) ? null : data;
   }
 
-  private formatarTelefoneParaWhatsapp(telefone?: string): string | null {
-    const apenasNumeros = telefone?.replaceAll(/\D/g, '');
-
-    if (!apenasNumeros) {
-      return null;
-    }
-
-    return apenasNumeros.startsWith('55') ? apenasNumeros : `55${apenasNumeros}`;
-  }
-
-  private criarUrlWhatsappWeb(telefone: string, mensagem: string): string {
-    const texto = encodeURIComponent(mensagem);
-
-    return this.isDispositivoMovel()
-      ? `https://wa.me/${telefone}?text=${texto}`
-      : `https://web.whatsapp.com/send?phone=${telefone}&text=${texto}`;
-  }
-
-  private criarUrlWhatsappApp(telefone: string, mensagem: string): string {
-    return `whatsapp://send?phone=${telefone}&text=${encodeURIComponent(mensagem)}`;
-  }
-
-  private isDispositivoMovel(): boolean {
-    return (
-      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
-      navigator.userAgent.includes('Mobile')
-    );
-  }
-
   private abrirWhatsapp(telefone: string, mensagem: string, destino?: Window): void {
-    const urlWeb = this.criarUrlWhatsappWeb(telefone, mensagem);
-
-    if (!this.isDispositivoMovel()) {
-      if (destino) {
-        destino.location.href = urlWeb;
-      } else {
-        window.open(urlWeb, '_blank', 'noopener,noreferrer');
-      }
-      return;
-    }
-
-    const urlApp = this.criarUrlWhatsappApp(telefone, mensagem);
-
-    if (destino) {
-      destino.location.href = urlApp;
-      globalThis.setTimeout(() => {
-        try {
-          if (!destino.closed) {
-            destino.location.href = urlWeb;
-          }
-        } catch {
-          window.open(urlWeb, '_blank', 'noopener,noreferrer');
-        }
-      }, 900);
-      return;
-    }
-
-    window.location.href = urlApp;
-    globalThis.setTimeout(() => {
-      window.open(urlWeb, '_blank', 'noopener,noreferrer');
-    }, 900);
+    this.whatsappService.abrirConversa(telefone, mensagem, destino);
   }
 
   private criarMensagemConfirmacao(nomePaciente: string, dataHoraInicio: Date): string {
