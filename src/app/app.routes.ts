@@ -46,6 +46,12 @@ export const routes: Routes = [
     canMatch: [authGuard],
   },
   {
+    path: 'evolucoes',
+    loadComponent: () =>
+      import('./features/evolucoes/pages/evolucoes/evolucoes').then((m) => m.Evolucoes),
+    canMatch: [authGuard],
+  },
+  {
     path: 'usuarios',
     loadComponent: () =>
       import('./features/usuarios/pages/usuarios/usuarios').then((m) => m.Usuarios),

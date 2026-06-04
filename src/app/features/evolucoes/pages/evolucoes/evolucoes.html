@@ -1,0 +1,233 @@
+<div class="space-y-6 animate-in fade-in duration-500">
+  <section class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-foreground">Evoluções psicoterapêuticas</h1>
+      <p class="mt-1 text-sm text-muted-foreground">
+        Acompanhe os registros vinculados aos agendamentos já criados para o paciente selecionado.
+      </p>
+      @if (pacienteIdSelecionado()) {
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <span
+            class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold status-info"
+          >
+            Filtrado por paciente
+          </span>
+          <span class="text-sm text-foreground">
+            {{ pacienteNomeSelecionado() || 'Paciente selecionado' }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2 sm:flex-row">
+      @if (pacienteIdSelecionado()) {
+        <button type="button" z-button zType="outline" (click)="limparFiltroPaciente()">
+          <z-icon zType="x" class="h-4 w-4" />
+          Limpar filtro
+        </button>
+      }
+
+      <button
+        type="button"
+        z-button
+        zType="brand"
+        [zLoading]="loading()"
+        (click)="carregarEvolucoes()"
+      >
+        <z-icon zType="clock" class="h-4 w-4" />
+        Atualizar
+      </button>
+    </div>
+  </section>
+
+  @if (!podeVisualizar()) {
+    <section class="surface-elevated p-8 text-center">
+      <div
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-warning/15 text-warning-foreground"
+      >
+        <z-icon zType="triangle-alert" class="h-5 w-5" />
+      </div>
+      <h2 class="mt-4 text-lg font-semibold text-foreground">Acesso negado</h2>
+      <p class="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+        Sua conta não possui a permissão <strong>EVOLUCAO_VISUALIZAR</strong> para consultar este
+        módulo.
+      </p>
+    </section>
+  } @else {
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <article class="surface-card p-4">
+        <p class="text-sm font-medium text-muted-foreground">Total de evoluções</p>
+        <strong class="mt-2 block text-2xl font-semibold text-foreground">
+          {{ evolucoesFiltradas().length }}
+        </strong>
+      </article>
+
+      <article class="surface-card p-4">
+        <p class="text-sm font-medium text-muted-foreground">Preenchidas</p>
+        <strong class="mt-2 block text-2xl font-semibold text-foreground">
+          {{ totalPreenchidas() }}
+        </strong>
+      </article>
+
+      <article class="surface-card p-4">
+        <p class="text-sm font-medium text-muted-foreground">Pendentes</p>
+        <strong class="mt-2 block text-2xl font-semibold text-foreground">
+          {{ totalPendentes() }}
+        </strong>
+      </article>
+
+      <article class="surface-card p-4">
+        <p class="text-sm font-medium text-muted-foreground">Permissões ativas</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span
+            class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold status-info"
+          >
+            Visualizar
+          </span>
+          @if (podeEditar()) {
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold status-success"
+            >
+              Editar
+            </span>
+          }
+          @if (podeRemover()) {
+            <span
+              class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold status-danger"
+            >
+              Remover
+            </span>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="surface-elevated overflow-hidden">
+      <div class="grid gap-3 border-b border-border/70 bg-muted/30 p-4 md:grid-cols-[1.4fr_220px]">
+        <label class="space-y-1.5">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+            >Buscar</span
+          >
+          <input
+            z-input
+            type="search"
+            placeholder="Paciente, conteúdo, observações..."
+            [value]="busca()"
+            (input)="atualizarBusca($event)"
+          />
+        </label>
+
+        <label class="space-y-1.5">
+          <span class="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground"
+            >Preenchimento</span
+          >
+          <select
+            class="filter-select"
+            [value]="filtroPreenchimento()"
+            (change)="alterarFiltroPreenchimento($event)"
+          >
+            <option value="TODOS">Todos</option>
+            <option value="PENDENTE">Pendentes</option>
+            <option value="PREENCHIDA">Preenchidas</option>
+          </select>
+        </label>
+      </div>
+
+      @if (loading()) {
+        <div class="px-6 py-16 text-center text-muted-foreground">Carregando evoluções...</div>
+      } @else if (evolucoesFiltradas().length === 0) {
+        <div class="px-6 py-16 text-center">
+          <div class="flex flex-col items-center gap-3">
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground"
+            >
+              <z-icon zType="book-open-text" class="h-5 w-5" />
+            </div>
+            <p class="font-medium text-foreground">Nenhuma evolução encontrada.</p>
+            <p class="text-sm text-muted-foreground">
+              Ajuste os filtros ou aguarde a criação automática ao cadastrar novos agendamentos.
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="evolucao-grid">
+          @for (evolucao of evolucoesFiltradas(); track evolucao.id) {
+            <article class="surface-card evolucao-card p-5">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-primary/10 bg-primary/10 text-sm font-bold text-primary"
+                  >
+                    {{ getIniciais(evolucao.agendamento.paciente.nome) }}
+                  </div>
+
+                  <div>
+                    <h2 class="font-semibold text-foreground">
+                      {{ evolucao.agendamento.paciente.nome }}
+                    </h2>
+                    <p class="text-sm text-muted-foreground">
+                      {{ formatarData(evolucao.agendamento.dataHoraInicio) }} às
+                      {{ formatarHora(evolucao.agendamento.dataHoraInicio) }}
+                    </p>
+                  </div>
+                </div>
+
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getClassePreenchimento(evolucao)"
+                >
+                  {{ getLabelPreenchimento(evolucao) }}
+                </span>
+              </div>
+
+              <div class="mt-4 flex flex-wrap gap-2">
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getClasseStatus(evolucao.agendamento.statusAtendimento)"
+                >
+                  {{ getLabelStatus(evolucao.agendamento.statusAtendimento) }}
+                </span>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold status-neutral"
+                >
+                  {{ evolucao.agendamento.tipoAtendimento.nome }}
+                </span>
+              </div>
+
+              <p class="mt-4 line-clamp-3 text-sm leading-6 text-muted-foreground">
+                {{ resumoConteudo(evolucao) }}
+              </p>
+
+              <div class="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <button type="button" z-button zType="soft" (click)="abrirVisualizacao(evolucao)">
+                  <z-icon zType="eye" class="h-4 w-4" />
+                  Visualizar
+                </button>
+
+                @if (podeEditar()) {
+                  <button type="button" z-button zType="outline" (click)="abrirEdicao(evolucao)">
+                    <z-icon zType="file-text" class="h-4 w-4" />
+                    Editar
+                  </button>
+                }
+
+                @if (podeRemover()) {
+                  <button
+                    type="button"
+                    z-button
+                    zType="destructive"
+                    [disabled]="removendoId() === evolucao.id"
+                    (click)="confirmarRemocao(evolucao)"
+                  >
+                    <z-icon zType="trash" class="h-4 w-4" />
+                    {{ removendoId() === evolucao.id ? 'Removendo...' : 'Remover' }}
+                  </button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</div>

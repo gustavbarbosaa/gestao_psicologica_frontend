@@ -57,6 +57,16 @@
             <div
               class="patients-actions flex items-center justify-end gap-1 opacity-50 transition-all duration-200 group-hover:opacity-100"
             >
+              @if (podeVisualizarEvolucoes) {
+                <button
+                  type="button"
+                  class="p-2 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                  title="Ver evoluções"
+                  (click)="abrirEvolucoesPaciente(paciente)"
+                >
+                  <z-icon zType="book-open-text" class="w-4 h-4" />
+                </button>
+              }
               <button
                 type="button"
                 class="p-2 rounded-lg text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-colors"

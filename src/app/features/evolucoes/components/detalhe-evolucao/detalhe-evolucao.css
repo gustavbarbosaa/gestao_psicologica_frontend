@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+textarea[readonly] {
+  cursor: default;
+  background: rgb(248 250 252);
+  border-color: rgb(226 232 240);
+}

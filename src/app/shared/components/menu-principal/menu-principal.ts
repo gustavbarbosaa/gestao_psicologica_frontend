@@ -47,6 +47,14 @@ export class MenuPrincipal {
       },
     ];
 
+    if (this.loginService.hasAuthority('EVOLUCAO_VISUALIZAR')) {
+      menus.push({
+        icone: 'book-open-text',
+        titulo: 'Evoluções',
+        url: '/evolucoes',
+      });
+    }
+
     if (this.isAdmin()) {
       menus.push({
         icone: 'shield',

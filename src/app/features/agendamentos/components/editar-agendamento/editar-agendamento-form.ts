@@ -37,6 +37,7 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs';
+import { Router } from '@angular/router';
 
 type EditarAgendamentoModalData = {
   dataHoraInicio?: string | Date;
@@ -73,6 +74,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   private readonly dialogRef = inject<ZardDialogRef<EditarAgendamentoForm>>(ZardDialogRef as any);
   private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly modalData = inject(Z_MODAL_DATA) as EditarAgendamentoModalData | undefined;
+  private readonly router = inject(Router);
 
   public dadosCarregados = signal<boolean>(false);
   public pacientes = signal<iPacienteMaxResponse[]>([]);
@@ -83,6 +85,7 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
   public carregandoPacientes = signal<boolean>(false);
   public inativandoAgendamento = signal<boolean>(false);
   public horaAtual = signal<Date>(new Date());
+  public podeVisualizarEvolucoes = this.loginService.hasAuthority('EVOLUCAO_VISUALIZAR');
   public pacienteSelecionado = computed(() => {
     const pacienteId = this.form.controls.pacienteId.value || this.agendamento()?.paciente.id;
 
@@ -442,6 +445,22 @@ export class EditarAgendamentoForm implements OnInit, OnDestroy {
     if (destino) {
       this.abrirWhatsapp(destino.telefone, destino.mensagem);
     }
+  }
+
+  irParaEvolucoes(): void {
+    const agendamento = this.agendamento();
+
+    if (!this.podeVisualizarEvolucoes || !agendamento?.paciente?.id) {
+      return;
+    }
+
+    this.dialogRef.close();
+    this.router.navigate(['/evolucoes'], {
+      queryParams: {
+        pacienteId: agendamento.paciente.id,
+        pacienteNome: agendamento.paciente.nome,
+      },
+    });
   }
 
   inativarAgendamento(): void {

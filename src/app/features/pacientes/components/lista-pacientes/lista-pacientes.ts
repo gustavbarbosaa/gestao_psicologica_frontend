@@ -10,6 +10,7 @@ import { ZardTableImports } from '@shared/components/table';
 import { NgClass } from '@angular/common';
 import { NgxMaskPipe } from 'ngx-mask';
 import { EditarPaciente } from '../editar-paciente/editar-paciente';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-lista-pacientes',
@@ -23,9 +24,11 @@ export class ListaPacientes implements OnInit {
   toastService = inject(ToastService);
   private readonly dialog = inject(ZardDialogService);
   private readonly vcr = inject(ViewContainerRef);
+  private readonly router = inject(Router);
 
   pacientes = signal<iPacienteMaxResponse[]>([]);
   pacientesFiltrados = signal<iPacienteMaxResponse[]>([]);
+  protected readonly podeVisualizarEvolucoes = this.usuarioService.hasAuthority('EVOLUCAO_VISUALIZAR');
 
   ngOnInit(): void {
     this.carregarPacientes();
@@ -87,6 +90,15 @@ export class ListaPacientes implements OnInit {
         },
       });
     }
+  }
+
+  protected abrirEvolucoesPaciente(paciente: iPacienteMaxResponse): void {
+    this.router.navigate(['/evolucoes'], {
+      queryParams: {
+        pacienteId: paciente.id,
+        pacienteNome: paciente.nome,
+      },
+    });
   }
 
   protected getIniciais(nomePaciente: string): string {
