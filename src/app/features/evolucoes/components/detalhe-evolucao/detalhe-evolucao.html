@@ -1,7 +1,11 @@
 @if (loading()) {
-  <div class="flex min-h-64 items-center justify-center rounded-2xl border border-border bg-card p-8">
+  <div
+    class="flex min-h-64 items-center justify-center rounded-2xl border border-border bg-card p-8"
+  >
     <div class="space-y-3 text-center">
-      <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground">
+      <div
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground"
+      >
         <z-icon zType="file-text" class="h-5 w-5" />
       </div>
       <p class="text-sm font-medium text-muted-foreground">Carregando evolução...</p>
@@ -11,145 +15,158 @@
   <div class="w-full bg-white">
     <div class="rounded-xl border border-slate-100 bg-white shadow-sm">
       <div class="flex items-center gap-3 border-b border-slate-100 bg-slate-50/60 px-5 py-4">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"
+        >
           <z-icon zType="book-open-text" />
         </div>
-        <div>
+        <div class="flex flex-col gap-1">
           <h2 class="text-lg font-bold text-slate-800">Evolução psicoterapêutica</h2>
           <p class="text-xs text-slate-500">Registro clínico vinculado ao agendamento.</p>
         </div>
       </div>
 
       <div class="space-y-5 p-4 sm:space-y-5 sm:p-5">
-    <section class="rounded-xl border border-slate-100 bg-white shadow-sm">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div class="space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="section-kicker">Evolução psicoterapêutica</span>
-            <span
-              class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
-              [ngClass]="getClassePreenchimento()"
+        <section class="rounded-xl border border-slate-100 bg-white shadow-sm">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="space-y-3">
+              <div class="p-2 flex items-center gap-2">
+                <span class="section-kicker">Evolução psicoterapêutica</span>
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getClassePreenchimento()"
+                >
+                  {{ evolucao.conteudo?.trim() ? 'Preenchida' : 'Pendente de preenchimento' }}
+                </span>
+              </div>
+
+              <div class="px-2 pb-4">
+                <h2 class="text-xl font-semibold text-foreground">
+                  {{ evolucao.agendamento.paciente.nome }}
+                </h2>
+                <p class="text-sm text-muted-foreground">
+                  {{ formatarDataHora(evolucao.agendamento.dataHoraInicio) }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-5 grid gap-3 md:grid-cols-2">
+            <article class="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+              <span class="section-kicker">Tipo de atendimento</span>
+              <p class="mt-2 text-sm font-semibold text-foreground">
+                {{ evolucao.agendamento.tipoAtendimento.nome }}
+              </p>
+            </article>
+
+            <article class="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
+              <span class="section-kicker">Status do atendimento</span>
+              <div class="mt-2">
+                <span
+                  class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
+                  [ngClass]="getClasseStatus(evolucao.agendamento.statusAtendimento)"
+                >
+                  {{ getLabelStatus(evolucao.agendamento.statusAtendimento) }}
+                </span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <form [formGroup]="form" class="space-y-5">
+          <section class="space-y-2">
+            <label
+              class="flex items-center gap-2 text-sm font-semibold text-slate-700"
+              for="conteudo"
             >
-              {{ evolucao.conteudo?.trim() ? 'Preenchida' : 'Pendente de preenchimento' }}
-            </span>
-          </div>
+              <z-icon zType="book-open-text" class="h-4 w-4 text-primary" />
+              Conteúdo da evolução
+            </label>
+            <textarea
+              id="conteudo"
+              z-input
+              zSize="lg"
+              rows="8"
+              formControlName="conteudo"
+              [readOnly]="somenteLeitura()"
+              placeholder="Descreva a sessão, os pontos principais e os encaminhamentos terapêuticos."
+              class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 min-h-44"
+            ></textarea>
+            @if (form.controls.conteudo.invalid && form.controls.conteudo.touched) {
+              <p class="text-sm text-destructive">Conteúdo é obrigatório.</p>
+            }
+          </section>
 
-          <div>
-            <h2 class="text-xl font-semibold text-foreground">{{ evolucao.agendamento.paciente.nome }}</h2>
-            <p class="text-sm text-muted-foreground">
-              {{ formatarDataHora(evolucao.agendamento.dataHoraInicio) }}
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="mt-5 grid gap-3 md:grid-cols-2">
-        <article class="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-          <span class="section-kicker">Tipo de atendimento</span>
-          <p class="mt-2 text-sm font-semibold text-foreground">
-            {{ evolucao.agendamento.tipoAtendimento.nome }}
-          </p>
-        </article>
-
-        <article class="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-          <span class="section-kicker">Status do atendimento</span>
-          <div class="mt-2">
-            <span
-              class="inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold"
-              [ngClass]="getClasseStatus(evolucao.agendamento.statusAtendimento)"
+          <section class="space-y-2">
+            <label
+              class="flex items-center gap-2 text-sm font-semibold text-slate-700"
+              for="observacoes"
             >
-              {{ getLabelStatus(evolucao.agendamento.statusAtendimento) }}
-            </span>
+              <z-icon zType="clipboard" class="h-4 w-4 text-primary" />
+              Observações complementares
+            </label>
+            <textarea
+              id="observacoes"
+              z-input
+              zSize="lg"
+              rows="4"
+              formControlName="observacoes"
+              [readOnly]="somenteLeitura()"
+              placeholder="Campo opcional para observações adicionais."
+              class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 min-h-28"
+            ></textarea>
+          </section>
+        </form>
+
+        <footer
+          class="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="text-xs text-muted-foreground">
+            {{ getLabelDataReferencia(evolucao) }}
+            <strong class="font-semibold text-foreground">{{
+              formatarDataHora(getDataReferencia(evolucao))
+            }}</strong>
           </div>
-        </article>
-      </div>
-    </section>
 
-    <form [formGroup]="form" class="space-y-5">
-      <section class="space-y-2">
-        <label class="flex items-center gap-2 text-sm font-semibold text-slate-700" for="conteudo">
-          <z-icon zType="book-open-text" class="h-4 w-4 text-primary" />
-          Conteúdo da evolução
-        </label>
-        <textarea
-          id="conteudo"
-          z-input
-          zSize="lg"
-          rows="8"
-          formControlName="conteudo"
-          [readOnly]="somenteLeitura()"
-          placeholder="Descreva a sessão, os pontos principais e os encaminhamentos terapêuticos."
-          class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 min-h-44"
-        ></textarea>
-        @if (form.controls.conteudo.invalid && form.controls.conteudo.touched) {
-          <p class="text-sm text-destructive">Conteúdo é obrigatório.</p>
-        }
-      </section>
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+            @if (somenteLeitura() && data.canEdit) {
+              <button type="button" z-button zType="brand" (click)="habilitarEdicao()">
+                <z-icon zType="file-text" class="h-4 w-4" />
+                Editar evolução
+              </button>
+            }
 
-      <section class="space-y-2">
-        <label class="flex items-center gap-2 text-sm font-semibold text-slate-700" for="observacoes">
-          <z-icon zType="clipboard" class="h-4 w-4 text-primary" />
-          Observações complementares
-        </label>
-        <textarea
-          id="observacoes"
-          z-input
-          zSize="lg"
-          rows="4"
-          formControlName="observacoes"
-          [readOnly]="somenteLeitura()"
-          placeholder="Campo opcional para observações adicionais."
-          class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 min-h-28"
-        ></textarea>
-      </section>
-    </form>
+            @if (!somenteLeitura() && data.canRemove) {
+              <button
+                type="button"
+                z-button
+                zType="destructive"
+                [disabled]="removendo() || salvando()"
+                (click)="confirmarRemocao()"
+              >
+                <z-icon zType="trash" class="h-4 w-4" />
+                {{ removendo() ? 'Removendo...' : 'Remover evolução' }}
+              </button>
+            }
 
-    <footer class="flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-      <div class="text-xs text-muted-foreground">
-        {{ getLabelDataReferencia(evolucao) }}
-        <strong class="font-semibold text-foreground">{{ formatarDataHora(getDataReferencia(evolucao)) }}</strong>
-      </div>
+            <button type="button" z-button zType="outline" (click)="cancelar()">
+              {{ somenteLeitura() ? 'Fechar' : 'Cancelar' }}
+            </button>
 
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        @if (somenteLeitura() && data.canEdit) {
-          <button type="button" z-button zType="brand" (click)="habilitarEdicao()">
-            <z-icon zType="file-text" class="h-4 w-4" />
-            Editar evolução
-          </button>
-        }
-
-        @if (!somenteLeitura() && data.canRemove) {
-          <button
-            type="button"
-            z-button
-            zType="destructive"
-            [disabled]="removendo() || salvando()"
-            (click)="confirmarRemocao()"
-          >
-            <z-icon zType="trash" class="h-4 w-4" />
-            {{ removendo() ? 'Removendo...' : 'Remover evolução' }}
-          </button>
-        }
-
-        <button type="button" z-button zType="outline" (click)="cancelar()">
-          {{ somenteLeitura() ? 'Fechar' : 'Cancelar' }}
-        </button>
-
-        @if (!somenteLeitura() && data.canEdit) {
-          <button
-            type="button"
-            z-button
-            zType="brand"
-            [disabled]="salvando()"
-            (click)="salvar()"
-          >
-            <z-icon zType="save" class="h-4 w-4" />
-            {{ salvando() ? 'Salvando...' : 'Salvar edição' }}
-          </button>
-        }
-      </div>
-    </footer>
+            @if (!somenteLeitura() && data.canEdit) {
+              <button
+                type="button"
+                z-button
+                zType="brand"
+                [disabled]="salvando()"
+                (click)="salvar()"
+              >
+                <z-icon zType="save" class="h-4 w-4" />
+                {{ salvando() ? 'Salvando...' : 'Salvar edição' }}
+              </button>
+            }
+          </div>
+        </footer>
       </div>
     </div>
   </div>
