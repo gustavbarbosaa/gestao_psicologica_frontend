@@ -11,7 +11,7 @@ import {
 
 import { mergeClasses } from '@shared/utils/merge-classes';
 import { ZardStringTemplateOutletDirective } from '../core/directives/string-template-outlet/string-template-outlet.directive';
-import { cardBodyVariants, cardHeaderVariants, cardVariants } from './card.variants';
+import { cardBodyVariants, cardHeaderVariants, cardVariants, type ZardCardVariants } from './card.variants';
 
 @Component({
   selector: 'z-card',
@@ -48,10 +48,14 @@ import { cardBodyVariants, cardHeaderVariants, cardVariants } from './card.varia
 export class ZardCardComponent {
   readonly zTitle = input<string | TemplateRef<void>>();
   readonly zDescription = input<string | TemplateRef<void>>();
+  readonly zTone = input<ZardCardVariants['zTone']>('default');
+  readonly zPadding = input<ZardCardVariants['zPadding']>('default');
 
   readonly class = input<ClassValue>('');
 
-  protected readonly classes = computed(() => mergeClasses(cardVariants(), this.class()));
+  protected readonly classes = computed(() =>
+    mergeClasses(cardVariants({ zTone: this.zTone(), zPadding: this.zPadding() }), this.class()),
+  );
   protected readonly headerClasses = computed(() => mergeClasses(cardHeaderVariants()));
   protected readonly bodyClasses = computed(() => mergeClasses(cardBodyVariants()));
 }

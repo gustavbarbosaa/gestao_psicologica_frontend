@@ -20,6 +20,7 @@ export const inputGroupVariants = cva(
         sm: 'h-8',
         default: 'h-9',
         lg: 'h-10',
+        xl: 'h-12',
       },
       zDisabled: {
         true: 'opacity-50 cursor-not-allowed',
@@ -45,6 +46,7 @@ export const inputGroupAddonVariants = cva(
         sm: 'text-xs',
         default: 'text-sm',
         lg: 'text-base',
+        xl: 'text-lg',
       },
       zPosition: {
         before: 'rounded-l-md border-r-0',
@@ -82,6 +84,11 @@ export const inputGroupAddonVariants = cva(
         class: 'h-9.5',
       },
       {
+        zType: 'default',
+        zSize: 'xl',
+        class: 'h-11',
+      },
+      {
         zType: 'textarea',
         zPosition: 'before',
         class: 'mb-2',
@@ -107,6 +114,7 @@ export const inputGroupInputVariants = cva(
         sm: 'h-7.5 px-0.5 py-0 text-xs',
         default: 'h-8.5 px-0.5 py-0 text-sm',
         lg: 'h-9.5 px-0.5 py-0 text-base',
+        xl: 'h-11 px-1 py-0 text-lg',
       },
       zHasAddonBefore: {
         true: 'border-l-0 rounded-l-none',

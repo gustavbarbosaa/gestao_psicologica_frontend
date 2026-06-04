@@ -14,11 +14,12 @@ export const inputVariants = cva('w-full', {
       default: 'text-sm',
       sm: 'text-xs',
       lg: 'text-base',
+      xl: 'text-lg',
     },
     zStatus: {
       error: 'border-destructive focus-visible:ring-destructive',
-      warning: 'border-yellow-500 focus-visible:ring-yellow-500',
-      success: 'border-green-500 focus-visible:ring-green-500',
+      warning: 'border-warning focus-visible:ring-warning',
+      success: 'border-success focus-visible:ring-success',
     },
     zBorderless: {
       true: 'flex-1 bg-transparent border-0 outline-none focus-visible:ring-0 focus-visible:ring-offset-0 px-0 py-0',
@@ -32,6 +33,7 @@ export const inputVariants = cva('w-full', {
     { zType: 'default', zSize: 'default', class: 'h-9 py-2 file:max-md:py-0' },
     { zType: 'default', zSize: 'sm', class: 'h-8 file:md:py-2 file:max-md:py-1.5' },
     { zType: 'default', zSize: 'lg', class: 'h-10 py-1 file:md:py-3 file:max-md:py-2.5' },
+    { zType: 'default', zSize: 'xl', class: 'h-12 px-4 py-3' },
   ],
 });
 
