@@ -13,7 +13,11 @@
     <app-menu-principal class="flex-1 overflow-auto pb-24 bg-white" />
 
     <div class="absolute bottom-0 left-0 w-full px-6 py-4">
-      <app-avatar-info [nome]="usuario()!.nome" [email]="usuario()!.email" />
+      <app-avatar-info
+        [fotoUrl]="usuario()!.fotoUrl"
+        [nome]="usuario()!.nome"
+        [email]="usuario()!.email"
+      />
     </div>
   </z-sidebar>
 
@@ -34,7 +38,11 @@
       <app-menu-principal class="flex-1 overflow-auto px-4 py-4" />
 
       <div class="border-t border-slate-100 px-4 py-4">
-        <app-avatar-info [nome]="usuario()!.nome" [email]="usuario()!.email" />
+        <app-avatar-info
+          [fotoUrl]="usuario()!.fotoUrl"
+          [nome]="usuario()!.nome"
+          [email]="usuario()!.email"
+        />
       </div>
     </div>
   </aside>

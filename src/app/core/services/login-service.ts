@@ -12,6 +12,7 @@ export class LoginService {
 
   private httpClient: HttpClient = inject(HttpClient);
   private readonly API_URL: string = environment.apiUrl;
+  private readonly LOGIN_WITH_GOOGLE_PATH: string = 'autenticacao/google';
   private readonly LOGIN_PATH: string = 'autenticacao/login';
   private readonly LOGOUT_PATH: string = 'autenticacao/logout';
   private readonly CADASTRO_PATH: string = 'autenticacao/cadastro';
@@ -35,6 +36,19 @@ export class LoginService {
         return response.usuarioResponse;
       }),
     );
+  }
+
+  loginWithGoogle(idToken: string): Observable<iUsuarioAutenticado> {
+    return this.httpClient
+      .post<iLoginResponse>(`${this.API_URL}/${this.LOGIN_WITH_GOOGLE_PATH}`, { idToken })
+      .pipe(
+        map((response: iLoginResponse) => {
+          this.persistToken(response.token);
+          this.usuarioLogado.set(true);
+          this.usuario.set(response.usuarioResponse);
+          return response.usuarioResponse;
+        }),
+      );
   }
 
   logout(): Observable<void> {

@@ -10,6 +10,7 @@ import { ZardAvatarComponent } from '../avatar/avatar.component';
 export class AvatarInfo {
   nome = input.required<string>();
   email = input.required<string>();
+  fotoUrl = input<string | undefined>();
 
   iniciais = computed(() => {
     const nome = this.nome()?.trim();

@@ -108,6 +108,27 @@
             Entrar
           </button>
         </div>
+        <div class="space-y-2 pt-2">
+          <div class="relative flex items-center py-1">
+            <div class="flex-1 border-t border-border"></div>
+            <span class="px-3 text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              ou
+            </span>
+            <div class="flex-1 border-t border-border"></div>
+          </div>
+
+          <div class="flex min-h-11 items-center justify-center" #googleButtonRef>
+            @if (carregandoGoogle()) {
+              <span class="text-sm text-muted-foreground">Carregando login com Google...</span>
+            }
+          </div>
+
+          @if (!googleDisponivel()) {
+            <p class="text-center text-sm text-amber-700">
+              Não foi possível carregar o login com Google no momento.
+            </p>
+          }
+        </div>
       </form>
     </z-card>
   </section>

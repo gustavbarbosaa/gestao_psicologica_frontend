@@ -9,6 +9,7 @@ export interface iUsuarioAutenticado {
   email: string;
   authorities?: string[];
   ativo: boolean;
+  fotoUrl: string | undefined;
 }
 
 export interface iLoginResponse {
