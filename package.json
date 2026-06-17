@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "nx lint",
+    "lint": "ng lint",
     "format": "prettier --write \"src/**/*.{ts,html,css,scss,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,css,scss,json}\"",
     "lint:fix": "eslint \"src/**/*.{ts,html}\" --fix"

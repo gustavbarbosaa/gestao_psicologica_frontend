@@ -1,0 +1,85 @@
+name: 'Frontend CI/CD'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Baixar código'
+        uses: actions/checkout@v4
+
+      - name: 'Configurar Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: 'Instalar dependências'
+        run: npm ci
+
+      - name: 'Validar lint'
+        run: npm run lint
+
+      - name: 'Buildar projeto'
+        run: npm run build
+
+      - name: 'Verificar arquivos de build'
+        run: ls -la ./dist/gestao_psicologica_frontend/browser/
+
+  deploy:
+    needs: ci
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Atualizar aplicação no EC2'
+        uses: appleboy/ssh-action@v1
+        env:
+          DEPLOY_PATH: /gestao-psico/gestao_psicologica_frontend
+          SERVICE_NAME: frontend_gestao_psicologica
+          GIT_SHA: ${{ github.sha }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: '22'
+          envs: DEPLOY_PATH,SERVICE_NAME,GIT_SHA
+          script: |
+            set -eu
+
+            if [ ! -d "$DEPLOY_PATH/.git" ]; then
+              echo "Repositorio nao encontrado em $DEPLOY_PATH"
+              exit 1
+            fi
+
+            cd "$DEPLOY_PATH"
+
+            git fetch --all --prune
+            git checkout main
+            git reset --hard "$GIT_SHA"
+
+            if docker compose version >/dev/null 2>&1; then
+              DOCKER_COMPOSE="docker compose"
+            else
+              DOCKER_COMPOSE="docker-compose"
+            fi
+
+            $DOCKER_COMPOSE build "$SERVICE_NAME"
+            $DOCKER_COMPOSE up -d "$SERVICE_NAME"
+            $DOCKER_COMPOSE ps
+
+            docker image prune -f
