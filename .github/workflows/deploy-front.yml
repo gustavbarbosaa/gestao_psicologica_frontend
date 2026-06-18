@@ -45,38 +45,18 @@ jobs:
     steps:
       - name: 'Atualizar aplicação no EC2'
         uses: appleboy/ssh-action@v1
-        env:
-          DEPLOY_PATH: /gestao-psico/gestao_psicologica_frontend
-          SERVICE_NAME: frontend_gestao_psicologica
-          GIT_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: '22'
-          envs: DEPLOY_PATH,SERVICE_NAME,GIT_SHA
           script: |
-            set -eu
+            cd /home/ec2-user/gestao_psico
 
-            if [ ! -d "$DEPLOY_PATH/.git" ]; then
-              echo "Repositorio nao encontrado em $DEPLOY_PATH"
-              exit 1
-            fi
+            git -C gestao_psicologica_frontend pull origin main
 
-            cd "$DEPLOY_PATH"
+            docker-compose build frontend_gestao_psicologica
 
-            git fetch --all --prune
-            git checkout main
-            git reset --hard "$GIT_SHA"
-
-            if docker compose version >/dev/null 2>&1; then
-              DOCKER_COMPOSE="docker compose"
-            else
-              DOCKER_COMPOSE="docker-compose"
-            fi
-
-            $DOCKER_COMPOSE build "$SERVICE_NAME"
-            $DOCKER_COMPOSE up -d "$SERVICE_NAME"
-            $DOCKER_COMPOSE ps
+            docker-compose up -d frontend_gestao_psicologica
 
             docker image prune -f
