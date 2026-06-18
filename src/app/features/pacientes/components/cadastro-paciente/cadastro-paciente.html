@@ -13,7 +13,10 @@
     <form [formGroup]="form" (ngSubmit)="salvar()" class="space-y-4 p-4 sm:space-y-5 sm:p-5">
       <section class="grid gap-4">
         <div class="space-y-1.5">
-          <label for="nome" class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <label
+            for="nome"
+            class="input-required flex items-center gap-2 text-sm font-semibold text-slate-700"
+          >
             <z-icon zType="user" class="h-4 w-4 text-primary" />
             Nome completo
           </label>
@@ -22,6 +25,24 @@
             id="nome"
             formControlName="nome"
             placeholder="Insira o nome do paciente..."
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label
+            for="telefone"
+            class="input-required flex items-center gap-2 text-sm font-semibold text-slate-700"
+          >
+            <z-icon zType="smartphone" class="h-4 w-4 text-primary" />
+            Telefone
+          </label>
+          <input
+            z-input
+            id="telefone"
+            formControlName="telefone"
+            placeholder="(00) 0 0000-0000"
+            mask="(00) 0 0000-0000"
             class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
           />
         </div>
@@ -40,24 +61,6 @@
               class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
             />
           </div>
-
-          <div class="space-y-1.5">
-            <label
-              for="telefone"
-              class="flex items-center gap-2 text-sm font-semibold text-slate-700"
-            >
-              <z-icon zType="smartphone" class="h-4 w-4 text-primary" />
-              Telefone
-            </label>
-            <input
-              z-input
-              id="telefone"
-              formControlName="telefone"
-              placeholder="(00) 0 0000-0000"
-              mask="(00) 0 0000-0000"
-              class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none transition-all placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
         </div>
       </section>
 
@@ -65,7 +68,11 @@
         <button type="button" class="patient-action patient-action-neutral" (click)="cancelar()">
           Cancelar
         </button>
-        <button type="submit" class="patient-action patient-action-primary" [disabled]="form.invalid">
+        <button
+          type="submit"
+          class="patient-action patient-action-primary"
+          [disabled]="form.invalid"
+        >
           Salvar paciente
         </button>
       </div>

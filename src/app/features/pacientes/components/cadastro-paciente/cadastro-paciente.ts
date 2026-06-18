@@ -17,12 +17,7 @@ interface IModalData {
 @Component({
   selector: 'app-cadastro-paciente',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    NgxMaskDirective,
-    ZardIconComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, NgxMaskDirective, ZardIconComponent],
   templateUrl: './cadastro-paciente.html',
   styleUrl: './cadastro-paciente.css',
   providers: [provideNgxMask()],
@@ -59,7 +54,8 @@ export class CadastroPaciente implements OnInit {
         this.data?.onSaved?.();
         this.dialogRef.close(true);
       },
-      error: () => {
+      error: (error) => {
+        console.error('Erro ao criar paciente:', error);
         this.toastService.exibirToastErro('Erro', 'Falha ao criar paciente.');
       },
     });

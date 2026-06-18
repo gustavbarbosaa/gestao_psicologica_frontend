@@ -187,8 +187,16 @@ body.app-scroll-locked {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top left, color-mix(in oklab, var(--secondary) 65%, transparent) 0, transparent 24rem),
-    linear-gradient(180deg, color-mix(in oklab, var(--background) 92%, white) 0%, var(--background) 100%);
+    radial-gradient(
+      circle at top left,
+      color-mix(in oklab, var(--secondary) 65%, transparent) 0,
+      transparent 24rem
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--background) 92%, white) 0%,
+      var(--background) 100%
+    );
   color: var(--foreground);
   font-family: var(--font-family-sans);
   text-rendering: optimizeLegibility;
@@ -326,4 +334,9 @@ a {
 
 .fc-event.status-nao_compareceu {
   border-left: 4px solid var(--muted-foreground) !important;
+}
+
+.input-required::after {
+  content: '*';
+  color: var(--destructive);
 }
