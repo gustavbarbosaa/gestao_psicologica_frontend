@@ -61,8 +61,4 @@ jobs:
 
             docker-compose up -d frontend_gestao_psicologica
 
-            docker-compose ps
-
-            docker logs --tail=50 frontend_gestao_psicologica
-
             docker image prune -f
