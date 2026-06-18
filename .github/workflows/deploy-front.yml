@@ -55,7 +55,9 @@ jobs:
 
             git -C gestao_psicologica_frontend pull origin main
 
-            docker-compose build frontend_gestao_psicologica
+            docker-compose down frontend_gestao_psicologica
+
+            docker-compose build --no-cache frontend_gestao_psicologica
 
             docker-compose up -d frontend_gestao_psicologica
 
